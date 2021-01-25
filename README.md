@@ -8,12 +8,13 @@ If service is available, then HTTP response code will be printed to stdio. Other
 ```
 git clone https://github.com/alexeyhimself/web-monitor.git
 python3 -m venv ./web-monitor/
+source bin/activate
 cd ./web-monitor/
 pip3 install -r requirements.txt
 ```
 
 ## How to use
 ```
-python3 web-monitor.py https://google.com
+python3 monitor.py https://google.com
 ```
 where "https://google.com" - is an URL of monitored service

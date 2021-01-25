@@ -20,3 +20,6 @@ pip3 install -r requirements.txt
 python3 monitor.py
 ```
 adjust URL(s) of monitored service(s) in config.json
+
+## License
+WTFPL

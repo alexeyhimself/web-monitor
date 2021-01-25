@@ -1,7 +1,7 @@
-import requests
 from libs.config_loader import load_config
+from libs.servers_caller import call_server
 
-DEFAULT_TIMEOUT = 10  # seconds
+from multiprocessing import Process
 
 
 if __name__ == '__main__':
@@ -9,24 +9,14 @@ if __name__ == '__main__':
 
   monitored_urls = cfg.get("monitored_urls", [])
   if monitored_urls:
+    procs = []
     for each_url in monitored_urls:
-      url = each_url.get("url")
-      timeout = each_url.get("timeout", DEFAULT_TIMEOUT)
+      proc = Process(target=call_server, args=(each_url,))
+      procs.append(proc)
+      proc.start()
 
-      try:
-        r = requests.get(url, timeout=timeout)
-        msg = url + ': ' + str(r.status_code)
-        print(msg)
-
-      except requests.exceptions.ConnectionError:
-        msg = url + ': ' + "ConnectionError"
-        print(msg)
-      except requests.exceptions.Timeout:
-        msg = url + ': ' + "ConnectionError"
-        print(msg)
-      except Exception as why:
-        msg = url + ': ' + str(why)
-        print(msg)
+    for proc in procs:
+      proc.join()
 
   else:
     print("URL(s) to monitor have not been provided in config")

@@ -3,7 +3,7 @@ import requests
 import json
 
 CONFIG_PATH = 'config.json'
-DEFAULT_TIMEOUT = 10
+DEFAULT_TIMEOUT = 10  # seconds
 
 try:
   with open(CONFIG_PATH) as file:

@@ -1,19 +1,9 @@
-import sys
 import requests
-import json
+from libs.config_loader import load_config
 
-CONFIG_PATH = 'config.json'
 DEFAULT_TIMEOUT = 10  # seconds
 
-try:
-  with open(CONFIG_PATH) as file:
-    cfg_file = file.read()
-  cfg = json.loads(cfg_file)
-
-except Exception as why:
-  err_msg = "Could not load config file due to an error: " + str(why)
-  print(err_msg)
-  sys.exit()
+cfg = load_config()
 
 monitored_urls = cfg.get("monitored_urls", [])
 if monitored_urls:

@@ -17,6 +17,6 @@ pip3 install -r requirements.txt
 
 ## How to use
 ```
-python3 monitor.py https://google.com
+python3 monitor.py
 ```
-where "https://google.com" - is an URL of monitored service
+adjust URL(s) of monitored service(s) in config.json

@@ -2,7 +2,9 @@
 
 ## About
 Python app that checks availability of specified HTTP service.
-If service is available, then HTTP response code will be printed to stdio. Otherwise exception will occur.
+* If service is HTTP(S) available, then HTTP(S) response code will be printed to stdio.
+* If service is HTTP(S) unavailable, then either ConnectionError or Timeout (more than 10s wait) error will be printed to stdio.
+* If any other error will occur, reason will be printed to stdio.
 
 ## How to install
 ```

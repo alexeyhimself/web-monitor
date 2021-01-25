@@ -21,5 +21,10 @@ python3 monitor.py
 ```
 adjust URL(s) of monitored service(s) in config.json
 
+## Run autotests
+```
+pytest
+```
+
 ## License
 WTFPL

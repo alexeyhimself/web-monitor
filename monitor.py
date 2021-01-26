@@ -1,10 +1,16 @@
+import logging
+logger = logging.getLogger("monitor")
+from libs.logger_loader import *
+
 from libs.config_loader import load_config
 from libs.urls_caller import monitor_url
 
 from multiprocessing import Process
 
 
-if __name__ == '__main__':
+def start_monitor():
+  logger.info("Monitor service has been started")
+
   cfg = load_config()
 
   monitored_urls = cfg.get("monitored_urls", [])
@@ -19,4 +25,8 @@ if __name__ == '__main__':
       proc.join()
 
   else:
-    print("URL(s) to monitor have not been provided in config")
+    logger.error("No URL(s) to monitor in config.json")
+
+
+if __name__ == '__main__':
+  start_monitor()

@@ -5,3 +5,4 @@ pyvenv.cfg
 *.pyc
 config.dev.json
 *.log
+.local_debug

@@ -1,3 +1,6 @@
+import os.path
+handler = 'console' if os.path.isfile('.local_debug') else 'file'
+
 from logging.config import dictConfig
 
 log_format = "%(asctime)s.%(msecs)03d | %(levelname)s | %(name)s.py | "
@@ -31,7 +34,7 @@ logging_config = {
   },
   'loggers': {
     '': {
-      'handlers': ['console'],
+      'handlers': [handler],
       'level': 'INFO'
     }
   }

@@ -7,12 +7,9 @@ Python app that checks availability of specified HTTP service. It runs forever a
 * If any other error will occur, reason will be printed to stdio.
 
 ## How to install
+Download installation file and run it:
 ```
-git clone https://github.com/alexeyhimself/web-monitor.git
-python3 -m venv ./web-monitor/
-source bin/activate
-cd ./web-monitor/
-pip3 install -r requirements.txt
+wget -N https://raw.githubusercontent.com/alexeyhimself/web-monitor/main/install.sh && sh install.sh
 ```
 
 ## How to use

@@ -5,8 +5,8 @@ import os.path
 import logging
 logger = logging.getLogger(__name__)
 
-CONFIG_PATH = 'config.json'
-CONFIG_PATH_DEV = 'config.dev.json'
+CONFIG_PATH = 'configs/config.json'
+CONFIG_PATH_DEV = 'configs/config.dev.json'
 
 
 def load_config():

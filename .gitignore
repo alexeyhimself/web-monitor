@@ -3,6 +3,6 @@ include
 lib
 pyvenv.cfg
 *.pyc
-config.dev.json
+configs/config.dev.json
 *.log
 .local_debug

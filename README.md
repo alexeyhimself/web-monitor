@@ -1,4 +1,4 @@
-# web-monitor
+# Web-Monitor Service
 
 ## About
 Python app that checks availability of specified HTTP service. It runs forever and checks specified URL(s) for reply within specified timeout and with specified period.
@@ -19,8 +19,8 @@ pip3 install -r requirements.txt
 ```
 python3 monitor.py
 ```
-adjust URL(s) of monitored service(s) and their optional parameters in config.json:
-```
+adjust URL(s) of monitored service(s) and their optional parameters in `config.json`:
+```json
 {
   "monitored_urls": [
     {"url": "https://google.com"},
@@ -30,8 +30,8 @@ adjust URL(s) of monitored service(s) and their optional parameters in config.js
 }
 ```
 Optional monitored URL(s) parameters are:
-* timeout - time to wait request response [seconds], default 10
-* period - time between two consecutive requests [seconds], default 60
+* `timeout` - time to wait request response [seconds], **default 10**
+* `period` - time between two consecutive requests [seconds], **default 60**
 
 
 ## Run autotests

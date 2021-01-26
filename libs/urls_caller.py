@@ -50,7 +50,7 @@ def validate_period_and_timeout(each_url):
   period = each_url.get("period", DEFAULT_PERIOD)
   timeout = each_url.get("timeout", DEFAULT_TIMEOUT)
   if timeout > period:
-    msg = "Timeout (%s) can't be greater than period (%s). " % (timeout, period)
-    msg += "But for %s it is." % url
+    msg = "Timeout can't be greater than period. "
+    msg += "But for %s it is: %s > %s" % (url, timeout, period)
     print(msg)
     sys.exit()

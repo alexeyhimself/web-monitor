@@ -1,6 +1,6 @@
 import requests
 
-DEFAULT_TIMEOUT = 10  # seconds
+DEFAULT_TIMEOUT = 10  # time to wait request response [seconds]
 
 
 def call_server(each_url):
@@ -16,7 +16,7 @@ def call_server(each_url):
     msg = url + ': ' + "ConnectionError"
     print(msg)
   except requests.exceptions.Timeout:
-    msg = url + ': ' + "ConnectionError"
+    msg = url + ': ' + "Timeout"
     print(msg)
   except Exception as why:
     msg = url + ': ' + str(why)

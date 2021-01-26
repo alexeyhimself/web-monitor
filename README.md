@@ -13,6 +13,7 @@ wget -N https://raw.githubusercontent.com/alexeyhimself/web-monitor/main/install
 ```
 
 ## How to use
+In `web-monitor` folder run:
 ```
 python3 monitor.py
 ```

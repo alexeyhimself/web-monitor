@@ -9,15 +9,19 @@ DEFAULT_PERIOD = 60  # time between two consecutive requests [seconds]
 
 def call_url(url, timeout):
   try:
+    time_start = time.time()
     r = requests.get(url, timeout=timeout)
-    msg = url + ': ' + str(r.status_code)
+    time_end = time.time()
+
+    request_time = round(time_end - time_start, 3)
+    msg = url + ': ' + str(r.status_code) + ', time: %ss' % str(request_time)
     print(msg)
 
   except requests.exceptions.ConnectionError:
-    msg = url + ': ' + "ConnectionError"
+    msg = url + ': ' + 'ConnectionError'
     print(msg)
   except requests.exceptions.Timeout:
-    msg = url + ': ' + "Timeout"
+    msg = url + ': ' + 'Timeout, >' + str(timeout) + 's'
     print(msg)
   except Exception as why:
     msg = url + ': ' + str(why)

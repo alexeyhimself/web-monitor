@@ -11,3 +11,6 @@ source bin/activate
 
 # install required python libs
 pip3 install -r requirements.txt
+
+# remove install.sh on complete
+rm ../install.sh

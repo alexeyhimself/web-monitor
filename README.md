@@ -9,7 +9,7 @@ Python app that checks availability of specified HTTP service. It runs forever a
 ## How to install
 Download installation file and run it:
 ```
-wget -N https://raw.githubusercontent.com/alexeyhimself/web-monitor/main/install.sh && sh install.sh
+wget -N https://raw.githubusercontent.com/alexeyhimself/web-monitor/main/install/install.sh && sh install.sh
 ```
 
 ## How to use

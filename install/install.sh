@@ -10,7 +10,7 @@ cd ./web-monitor/
 source bin/activate
 
 # install required python libs
-pip3 install -r requirements.txt
+pip3 install -r install/requirements.txt
 
 # remove install.sh on complete
 rm ../install.sh

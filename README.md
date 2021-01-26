@@ -17,22 +17,24 @@ In `web-monitor` folder run:
 ```
 python3 monitor.py
 ```
-adjust URL(s) of monitored service(s) and their optional parameters in `config.json`:
+This will start monitoring of "https://google.com" with the period of 60 seconds.
+To set your own URL(s) of monitored service(s) and their optional parameters, adjust `config.json` file:
 ```json
 {
   "monitored_urls": [
     {"url": "https://google.com"},
-    {"url": "https://yandex.com", "timeout": 1},
-    {"url": "https://bing.com", "period": 30}
+    {"url": "https://yandex.ru", "timeout": 1},
+    {"url": "https://bing.com", "timeout": 10, "period": 30}
   ]
 }
 ```
-Optional monitored URL(s) parameters are:
-* `timeout` - time to wait request response [seconds], **default 10**
-* `period` - time between two consecutive requests [seconds], **default 60**
+Mandatory parameter - is `url`. Other parameters are optional:
+* `timeout` [seconds], default: 10 - maximum time to wait request's response. If exceeded then request is considered as failed due to timeout;
+* `period` [seconds], default: 60 - time between two consecutive monitoring requests. Must be greater than `timeout`.
 
 
 ## Run autotests
+In `web-monitor` folder run:
 ```
 pytest
 ```

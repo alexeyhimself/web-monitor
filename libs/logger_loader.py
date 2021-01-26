@@ -1,5 +1,8 @@
 import os.path
-handler = 'console' if os.path.isfile('.local_debug') else 'file'
+DEBUG = True if os.path.isfile('.local_debug') else False
+
+handler = 'console' if DEBUG == True else 'file'
+level = 'DEBUG' if DEBUG == True else 'INFO'
 
 from logging.config import dictConfig
 
@@ -35,7 +38,7 @@ logging_config = {
   'loggers': {
     '': {
       'handlers': [handler],
-      'level': 'INFO'
+      'level': level
     }
   }
 }

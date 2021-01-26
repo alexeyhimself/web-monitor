@@ -1,6 +1,10 @@
 import sys
 import time
 import requests
+
+import logging
+logger = logging.getLogger(__name__)
+
 from multiprocessing import Process
 
 DEFAULT_TIMEOUT = 10  # time to wait request response [seconds]
@@ -15,17 +19,17 @@ def call_url(url, timeout):
 
     request_time = round(time_end - time_start, 3)
     msg = url + ': ' + str(r.status_code) + ', time: %ss' % str(request_time)
-    print(msg)
+    logger.debug(msg)
 
   except requests.exceptions.ConnectionError:
     msg = url + ': ' + 'ConnectionError'
-    print(msg)
+    logger.warning(msg)
   except requests.exceptions.Timeout:
     msg = url + ': ' + 'Timeout, >' + str(timeout) + 's'
-    print(msg)
+    logger.warning(msg)
   except Exception as why:
     msg = url + ': ' + str(why)
-    print(msg)
+    logger.error(msg)
 
 
 def monitor_url(each_url):
@@ -33,7 +37,7 @@ def monitor_url(each_url):
   period = each_url.get("period", DEFAULT_PERIOD)
   timeout = each_url.get("timeout", DEFAULT_TIMEOUT)
 
-  validate_period_and_timeout(period, timeout)
+  validate_period_and_timeout(url, period, timeout)
 
   while True:
     proc = Process(target=call_url, args=(url, timeout,))
@@ -43,9 +47,9 @@ def monitor_url(each_url):
     time.sleep(period)
 
 
-def validate_period_and_timeout(period, timeout):
+def validate_period_and_timeout(url, period, timeout):
   if timeout > period:
     msg = "Timeout can't be greater than period. "
     msg += "But for %s it is: %s > %s" % (url, timeout, period)
-    print(msg)
+    logger.error(msg)
     sys.exit()

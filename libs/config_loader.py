@@ -2,6 +2,9 @@ import sys
 import json
 import os.path
 
+import logging
+logger = logging.getLogger(__name__)
+
 CONFIG_PATH = 'config.json'
 CONFIG_PATH_DEV = 'config.dev.json'
 
@@ -22,5 +25,5 @@ def load_config():
 
   except Exception as why:
     err_msg = "Could not load config file due to an error: " + str(why)
-    print(err_msg)
+    logger.critical(err_msg)
     sys.exit()

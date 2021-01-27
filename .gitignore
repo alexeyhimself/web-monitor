@@ -6,3 +6,6 @@ pyvenv.cfg
 configs/config.dev.json
 *.log
 .local_debug
+certs/kafka/ca.dev.pem
+certs/kafka/service.dev.cert
+certs/kafka/service.dev.key

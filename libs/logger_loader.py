@@ -1,6 +1,7 @@
 import logging  # do not log requests, urllib3 in DEBUG/INFO level
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("kafka").setLevel(logging.WARNING)
 
 import os.path
 DEBUG = True if os.path.isfile('.local_debug') else False

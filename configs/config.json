@@ -1,5 +1,13 @@
 {
   "monitored_urls": [
     {"url": "https://google.com"}
-  ]
+  ],
+  "kafka": {
+    "host": "",
+    "port": "19071",
+    "topic": "",
+    "ssl_cafile": "certs/kafka/ca.pem",
+    "ssl_certfile": "certs/kafka/service.cert",
+    "ssl_keyfile": "certs/kafka/service.key"
+  }
 }

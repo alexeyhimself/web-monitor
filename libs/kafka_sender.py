@@ -9,7 +9,9 @@ logger = logging.getLogger(__name__)
 def init_kafka_producer(cfg):
   host = cfg.get("host", "")
   port = cfg.get("port", "")
+  print(port)
   server = host + ':' + port
+  topic = cfg.get("topic")
 
   try:
     producer = KafkaProducer(
@@ -20,17 +22,14 @@ def init_kafka_producer(cfg):
       ssl_keyfile=cfg.get("ssl_keyfile"),
       value_serializer=lambda v: json.dumps(v).encode('utf-8')
     )
-    return producer
+    return producer, topic
 
   except Exception as why:
     logger.error(str(why), exc_info=True)
-    sys.exit()
+    sys.exit()  # exit, because unrecoverable failure
 
 
-def process_pre_kafka_queue(cfg, queue):
-  producer = init_kafka_producer(cfg)
-  topic = cfg.get("topic", "")
-
+def process_pre_kafka_queue(producer, topic, queue):
   while True:
     try:
       report_item = queue.get()
@@ -41,4 +40,4 @@ def process_pre_kafka_queue(cfg, queue):
 
     except Exception as why:
       logger.error(str(why), exc_info=True)
-      sys.exit()
+      sys.exit()  # exit, because unrecoverable failure

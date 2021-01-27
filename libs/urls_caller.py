@@ -7,13 +7,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 from multiprocessing import Process
-from libs.kafka_sender import put_to_kafka_queue
 
 DEFAULT_TIMEOUT = 10  # time to wait request response [seconds]
 DEFAULT_PERIOD = 60  # time between two consecutive requests [seconds]
 
 
-def call_url(url, timeout, period, regexp):
+def call_url(url, timeout, period, regexp, pre_kafka_queue):
   report = {
     'url': url,
     'timeout': timeout,
@@ -51,10 +50,10 @@ def call_url(url, timeout, period, regexp):
     logger.error(msg, exc_info=True)
     sys.exit()
 
-  put_to_kafka_queue(report)
+  pre_kafka_queue.put(report)
 
 
-def monitor_url(each_url):
+def monitor_url(each_url, pre_kafka_queue):
   url = each_url.get("url")
   period = each_url.get("period", DEFAULT_PERIOD)
   timeout = each_url.get("timeout", DEFAULT_TIMEOUT)
@@ -65,7 +64,8 @@ def monitor_url(each_url):
 
   # call call_url and wait for a period
   while True:
-    call = Process(target=call_url, args=(url, timeout, period, regexp,))
+    call_url_args = (url, timeout, period, regexp, pre_kafka_queue,)
+    call = Process(target=call_url, args=call_url_args)
     wait = Process(target=time.sleep, args=(period,))
     call.start()
     wait.start()

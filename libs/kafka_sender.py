@@ -2,5 +2,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def put_to_kafka_queue(report):
-  logger.info(report)
+def process_pre_kafka_queue(queue):
+  while True:
+    item = queue.get()
+    logger.info(item)
+    queue.task_done()

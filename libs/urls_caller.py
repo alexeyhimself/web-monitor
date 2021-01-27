@@ -7,9 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from multiprocessing import Process
-
-DEFAULT_TIMEOUT = 10  # time to wait request response [seconds]
-DEFAULT_PERIOD = 60  # time between two consecutive requests [seconds]
+from libs.config_loader import DEFAULT_TIMEOUT, DEFAULT_PERIOD
 
 
 def call_url(url, timeout, period, regexp, pre_kafka_queue):
@@ -46,10 +44,10 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
   except requests.exceptions.Timeout:
     report.update({'transport': 'conn_timeout', 'result': 'fail'})
   except Exception as why:
-    msg = url + ': ' + str(why)
-    logger.error(msg, exc_info=True)
-    sys.exit()
+    logger.error(report, exc_info=True)
+    sys.exit()  # don't want to report to Kafka such failed requests
 
+  logger.debug(report)
   pre_kafka_queue.put(report)
 
 
@@ -59,10 +57,8 @@ def monitor_url(each_url, pre_kafka_queue):
   timeout = each_url.get("timeout", DEFAULT_TIMEOUT)
   regexp = each_url.get("regexp")
 
-  # timeout must not be greater than period
-  validate_period_and_timeout(url, period, timeout)
-
-  # call call_url and wait for a period
+  # Every period call call_url, which always ends prior period thanks to
+  # config validation where must be timeout <= period
   while True:
     call_url_args = (url, timeout, period, regexp, pre_kafka_queue,)
     call = Process(target=call_url, args=call_url_args)
@@ -72,11 +68,3 @@ def monitor_url(each_url, pre_kafka_queue):
 
     call.join()
     wait.join()
-
-
-def validate_period_and_timeout(url, period, timeout):
-  if timeout > period:
-    msg = "Timeout can't be greater than period. "
-    msg += "But for %s it is: %s > %s" % (url, timeout, period)
-    logger.error(msg)
-    sys.exit()

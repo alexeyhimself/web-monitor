@@ -17,8 +17,7 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
   report = {
     'url': url,
     'timeout': timeout,
-    'period': period,
-    'regexp': regexp
+    'period': period
   }
 
   try:
@@ -57,6 +56,7 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
       result = 'ok' if regexp_found == True else 'fail'
 
       report.update({
+        'regexp': regexp,
         'regexp_found': regexp_found,
         'result': result
       })

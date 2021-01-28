@@ -7,6 +7,7 @@ from libs.logger_loader import *
 from libs.config_loader import load_config, validate_cfg
 from libs.urls_caller import monitor_url
 from libs.kafka_sender import process_pre_kafka_queue
+from libs.local_debug_loader import ld_cfg
 
 from multiprocessing import Process, JoinableQueue
 
@@ -47,5 +48,13 @@ def start_monitor():
     proc.join()
   """
 
+
+def start_kafka_to_db():
+  pass
+
+
 if __name__ == '__main__':
-  start_monitor()
+  if ld_cfg.get("service") == "backup":
+    start_kafka_to_db()
+  else:
+    start_monitor()

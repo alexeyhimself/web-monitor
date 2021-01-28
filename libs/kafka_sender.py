@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# Tries to establish connection to Kafka based on config.json params
+# Tries to establish producer connection to Kafka based on config.json params
 def init_kafka_producer(cfg):
   logger.info("Starting Kafka producer connector...")
 
@@ -54,8 +54,9 @@ def dump_queue(queue):
   return result
 
 
-# Every second tries to send reports from pre-Kafka queue to Kafka. 
-# If Kafka is unavailable, tries to send reports with 30s throtling.
+# Every 1 second (buffering_timeout is defined in dump_queue) tries to send 
+# reports from pre-Kafka queue to Kafka. If Kafka is unavailable, tries to 
+# send reports with 30s throtling.
 def process_pre_kafka_queue(cfg, queue):
   logger.info("Starting pre-Kafka queue processor...")
 
@@ -65,7 +66,7 @@ def process_pre_kafka_queue(cfg, queue):
 
   # INFO log is silent if everything is fine.
   # I want to see something in logs sometimes, that everything is fine
-  # and the service is working. So, 
+  # and the service is working.
   kafka_flushes = 0
   notify_in_flushes = 10
 
@@ -87,10 +88,10 @@ def process_pre_kafka_queue(cfg, queue):
           logger.info(msg)
 
         msg = "Just sent to Kafka %s reports." % len(report_items)
-        logger.debug(msg)
+        logger.info(msg)
       else:
         msg = "Nothing to send to Kafka yet."
-        logger.debug(msg)
+        logger.info(msg)
 
     except Exception as why:
       logger.error(str(why), exc_info=True)

@@ -1,6 +1,9 @@
 import sys
 import json
+import time
 from kafka import KafkaConsumer
+
+# from libs.db_sender import save_reports_to_db
 
 import logging
 logger = logging.getLogger(__name__)
@@ -24,9 +27,10 @@ def init_kafka_consumer(cfg):
     consumer = KafkaConsumer(
       topic,
       auto_offset_reset="earliest",
+      enable_auto_commit=False,
       bootstrap_servers=server,
-      client_id="demo-client-1",
-      group_id="demo-group",
+      # client_id="demo-client-1",
+      group_id="monitor-group",
       security_protocol="SSL",
       ssl_cafile=kafka_cfg.get("ssl_cafile"),
       ssl_certfile=kafka_cfg.get("ssl_certfile"),
@@ -55,9 +59,9 @@ def backup_kafka_to_db(cfg):
   # INFO log is silent if everything is fine.
   # I want to see something in logs sometimes, that everything is fine
   # and the service is working.
-  kafka_reports_cnt = 0
   kafka_polls = 0
-  notify_in_polls = 1
+  notify_in_polls = 10
+  kafka_reports_cnt = 0
 
   while True:
     try:
@@ -65,11 +69,11 @@ def backup_kafka_to_db(cfg):
       if report_items:
         for tp, msgs in report_items.items():
           for msg in msgs:
-            logger.debug("Received: {}".format(msg.value))
+            # save_reports_to_db(cfg, msgs)
             kafka_reports_cnt += 1
 
         kafka_polls += 1
-        consumer.commit()
+        # consumer.commit()
 
         if kafka_polls % notify_in_polls == 0:
           msg = "Service is alive, by this time "
@@ -77,6 +81,7 @@ def backup_kafka_to_db(cfg):
           logger.info(msg)
 
         msg = "Just received from Kafka %s reports." % kafka_reports_cnt
+        kafka_reports_cnt = 0
         logger.info(msg)
       else:
         msg = "Nothing to receive from Kafka yet."
@@ -84,4 +89,5 @@ def backup_kafka_to_db(cfg):
 
     except Exception as why:
       logger.error(str(why), exc_info=True)
+      logger.info("Waiting for a throtling period to allow Kafka to recover.")
       time.sleep(30)  # requests throtling in case of Kafka unavailable

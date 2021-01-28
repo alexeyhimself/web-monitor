@@ -9,5 +9,14 @@
     "ssl_cafile": "certs/kafka/ca.pem",
     "ssl_certfile": "certs/kafka/service.cert",
     "ssl_keyfile": "certs/kafka/service.key"
+  },
+  "db": {
+    "host": "",
+    "port": "19069",
+    "db_name": "",
+    "user": "",
+    "password": "",
+    "sslmode": "require",
+    "sslrootcert": "certs/db/ca.pem",
   }
 }

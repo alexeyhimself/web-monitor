@@ -10,6 +10,9 @@ from multiprocessing import Process
 from libs.config_loader import DEFAULT_TIMEOUT, DEFAULT_PERIOD
 
 
+# Calls specified URL with defined parameters, forms JSON report and
+# puts that report to pre-Kafka queue. In case of unrecoverable failure
+# sys.exit()'s
 def call_url(url, timeout, period, regexp, pre_kafka_queue):
   report = {
     'url': url,
@@ -20,24 +23,37 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
 
   try:
     time_start = time.time()
-    t = datetime.datetime.fromtimestamp(time_start)
-    report['time'] = t.strftime("%Y/%m/%d %H:%M:%S")
-
     r = requests.get(url, timeout=timeout)
     time_end = time.time()
 
-    report['transport'] = 'connected'
+    # if OS time sync will happen during request and will be corrected back
+    # then diff may become < 0! Many if's but may happen in long time use.
+    response_time = round(time_end - time_start, 3)
 
-    response_time = round(time_end - time_start, 3)  # if OS time sync, mbe < 0
-    report['response_time'] = response_time
+    # overall result to look at, aggregates: 
+    # response_code + transport issues + regexp
+    result = 'ok' if r.status_code == 200 else 'fail'
 
-    report['response_code'] = r.status_code
-    report['result'] = 'ok' if r.status_code == 200 else 'fail'
+    t = datetime.datetime.fromtimestamp(time_start)
+    report.update({
+      'time': t.strftime("%Y/%m/%d %H:%M:%S"),  # human readable
+      'time_unix': time_start,  # for programs and db's
+      'transport': 'connected',
+      'result': result,
+      'response_time': response_time,
+      'response_code': r.status_code
+    })    
 
-    if regexp:  # allowed to search in non-200 OK pages too and redefine result
+    # If HTTP 200 OK and regexp was assigned, then search for regexp and 
+    # redefine result based on that search.
+    if regexp and r.status_code == 200:
       regexp_found = True if re.search(regexp, r.text) else False
-      report['regexp_found'] = regexp_found
-      report['result'] = 'ok' if regexp_found == True else 'fail'
+      result = 'ok' if regexp_found == True else 'fail'
+
+      report.update({
+        'regexp_found': regexp_found,
+        'result': result
+      })
 
   except requests.exceptions.ConnectionError:
     report.update({'transport': 'conn_error', 'result': 'fail'})
@@ -51,6 +67,7 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
   pre_kafka_queue.put(report)
 
 
+# Calls call_url every period
 def monitor_url(each_url, pre_kafka_queue):
   url = each_url.get("url")
   period = each_url.get("period", DEFAULT_PERIOD)

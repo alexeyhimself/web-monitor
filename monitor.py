@@ -49,8 +49,14 @@ def start_monitor():
   """
 
 
+from libs.kafka_receiver import init_kafka_consumer, backup_kafka_to_db
+
+
 def start_kafka_to_db():
-  pass
+  logger.info("Starting Kafka to PostgreSQL backup service...")
+
+  cfg = load_config()
+  backup_kafka_to_db(cfg)
 
 
 if __name__ == '__main__':

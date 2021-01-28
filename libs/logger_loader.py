@@ -4,10 +4,17 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("kafka").setLevel(logging.WARNING)
 
 import os.path
-DEBUG = True if os.path.isfile('.local_debug') else False
+from libs.config_loader import load_config
+ld_path = '.local_debug'
 
-handler = 'console' if DEBUG == True else 'file'
-level = 'DEBUG' if DEBUG == True else 'INFO'
+if os.path.isfile(ld_path):
+  DEBUG = True
+  ld_cfg = load_config(ld_path)
+else:
+  DEBUG = False
+
+handler = ld_cfg.get("log_handler", "console") if DEBUG == True else "file"
+level = ld_cfg.get("log_level", "DEBUG") if DEBUG == True else "INFO"
 
 from logging.config import dictConfig
 

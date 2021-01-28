@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 # CONFIG_PATH. CONFIG_PATH_DEV file also is in .gitignore
 CONFIG_PATH = 'configs/config.json'
 CONFIG_PATH_DEV = 'configs/config.dev.json'
-cfg_path = CONFIG_PATH_DEV if os.path.isfile(CONFIG_PATH_DEV) else CONFIG_PATH
+cp = CONFIG_PATH_DEV if os.path.isfile(CONFIG_PATH_DEV) else CONFIG_PATH
 
 
-def load_config():
+def load_config(cfg_path = cp):
   logger.info("Loading monitor service config...")
 
   try:

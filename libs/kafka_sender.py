@@ -62,4 +62,4 @@ def process_pre_kafka_queue(cfg, queue):
 
     except Exception as why:
       logger.error(str(why), exc_info=True)
-      sys.exit()  # exit, because unrecoverable failure
+      time.sleep(30)  # requests throtling in case of Kafka unavailable

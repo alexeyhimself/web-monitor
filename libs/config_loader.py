@@ -46,22 +46,22 @@ def validate_cfg(cfg):
       if not (isinstance(period, int) or isinstance(period, float)):
         msg = "Period must be integer or float. "
         msg += "But for %s it is not: %s. " % (url, period)
-        logger.error(msg)
+        logger.critical(msg)
         sys.exit()  # exit, because unrecoverable failure
 
       if not (isinstance(timeout, int) or isinstance(timeout, float)):
         msg = "Timeout must be integer or float. "
         msg += "But for %s it is not: %s. " % (url, timeout)
-        logger.error(msg)
+        logger.critical(msg)
         sys.exit()  # exit, because unrecoverable failure
 
       if timeout > period:
         msg = "Timeout can't be greater than period. "
         msg += "But for %s it is: %s > %s. " % (url, timeout, period)
-        logger.error(msg)
+        logger.critical(msg)
         sys.exit()  # exit, because unrecoverable failure
   else:
     msg = "No URL(s) to monitor in config.json. "
     msg += "Monitor service will not be started!"
-    logger.error(msg)
+    logger.critical(msg)
     sys.exit()  # exit, because unrecoverable failure

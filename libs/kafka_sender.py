@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# Tries to establish connection to Kafka based on config.json params
 def init_kafka_producer(cfg):
   logger.info("Starting Kafka producer connector...")
 
@@ -30,10 +31,12 @@ def init_kafka_producer(cfg):
     return producer, topic
 
   except Exception as why:
-    logger.error(str(why), exc_info=True)
+    logger.critical(str(why), exc_info=True)
     sys.exit()  # exit, because unrecoverable failure
 
 
+# Sends reports from pre-Kafka queue to Kafka. If Kafka is unavailable, tries
+# to send reports with 30s throtling
 def process_pre_kafka_queue(cfg, queue):
   logger.info("Starting pre-Kafka queue processor...")
 
@@ -51,7 +54,7 @@ def process_pre_kafka_queue(cfg, queue):
       report_item = queue.get()
       if report_item:
         producer.send(topic, report_item)
-        producer.flush()
+        producer.flush()  # it's better to form groups of reports before flush
         queue.task_done()
         report_items += 1
 

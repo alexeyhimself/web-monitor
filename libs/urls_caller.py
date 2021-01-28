@@ -60,7 +60,7 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
   except requests.exceptions.Timeout:
     report.update({'transport': 'conn_timeout', 'result': 'fail'})
   except Exception as why:
-    logger.error(report, exc_info=True)
+    logger.critical(report, exc_info=True)
     sys.exit()  # don't want to report to Kafka such failed requests
 
   logger.debug(report)

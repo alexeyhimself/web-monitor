@@ -87,6 +87,14 @@ def apply_to_db(cfg, sql, is_recoverable = True):
   sslmode = db_cfg.get("sslmode")
   sslrootcert = db_cfg.get("sslrootcert")
 
+  conn = psycopg2.connect(dbname=db_name, user=user, password=password, 
+      host=host, port=port, sslmode=sslmode, sslrootcert=sslrootcert)
+  cursor = conn.cursor()
+  cursor.execute(sql)
+  cursor.close()
+  conn.close()
+
+  """
   try:
     conn = psycopg2.connect(dbname=db_name, user=user, password=password, 
       host=host, port=port, sslmode=sslmode, sslrootcert=sslrootcert)
@@ -105,3 +113,4 @@ def apply_to_db(cfg, sql, is_recoverable = True):
       msg = "Service would not be started due to an error: " + str(why)
       logger.critical(msg, exc_info=True)
       sys.exit()  # exit, because unrecoverable failure
+  """

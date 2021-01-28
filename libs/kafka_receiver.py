@@ -89,5 +89,6 @@ def backup_kafka_to_db(cfg):
 
     except Exception as why:
       logger.error(str(why), exc_info=True)
-      logger.info("Waiting for a throtling period to allow Kafka to recover.")
-      time.sleep(30)  # requests throtling in case of Kafka unavailable
+      msg = "Waiting for a throtling period to allow Kafka or DB to recover."
+      logger.info(msg)
+      time.sleep(10)  # requests throtling

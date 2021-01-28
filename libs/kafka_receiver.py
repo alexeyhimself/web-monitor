@@ -3,7 +3,7 @@ import json
 import time
 from kafka import KafkaConsumer
 
-# from libs.db_sender import save_reports_to_db
+from libs.db_sender import save_reports_to_db
 
 import logging
 logger = logging.getLogger(__name__)
@@ -26,15 +26,16 @@ def init_kafka_consumer(cfg):
   try:
     consumer = KafkaConsumer(
       topic,
-      auto_offset_reset="earliest",
+      auto_offset_reset="latest",
       enable_auto_commit=False,
       bootstrap_servers=server,
-      # client_id="demo-client-1",
-      group_id="monitor-group",
+      client_id="web-monitor-client-1",
+      group_id="web-monitor-group",
       security_protocol="SSL",
       ssl_cafile=kafka_cfg.get("ssl_cafile"),
       ssl_certfile=kafka_cfg.get("ssl_certfile"),
-      ssl_keyfile=kafka_cfg.get("ssl_keyfile")
+      ssl_keyfile=kafka_cfg.get("ssl_keyfile"),
+      value_deserializer=lambda v: json.loads(v.decode('utf-8'))
     )
 
     consumer.poll(timeout_ms=1000)  # initial call will assign partitions
@@ -68,12 +69,11 @@ def backup_kafka_to_db(cfg):
       report_items = consumer.poll(timeout_ms=1000)
       if report_items:
         for tp, msgs in report_items.items():
-          for msg in msgs:
-            # save_reports_to_db(cfg, msgs)
-            kafka_reports_cnt += 1
+          save_reports_to_db(cfg, msgs)
+          kafka_reports_cnt = len(msgs)
 
         kafka_polls += 1
-        # consumer.commit()
+        consumer.commit()
 
         if kafka_polls % notify_in_polls == 0:
           msg = "Service is alive, by this time "

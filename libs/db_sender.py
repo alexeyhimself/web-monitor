@@ -11,15 +11,17 @@ import psycopg2
 # https://help.compose.com/docs/postgresql-and-python
 # https://postgrespro.ru/docs/postgresql/9.6/sql-createtable
 # https://postgrespro.ru/docs/postgresql/9.6/datatype-numeric
+# https://www.postgresql.org/docs/9.1/sql-createindex.html
 
 def init_monitoring_table(cfg):
   logger.info("Creating web_monitoring table in DB...")
-
-  sql = "CREATE TABLE IF NOT EXISTS web_monitoring (\
+  """
+  sql = "DROP table web_monitoring; COMMIT;"
+  sql += "CREATE TABLE IF NOT EXISTS web_monitoring (\
       id            BIGSERIAL,\
       url           TEXT,\
-      time          TEXT,\
-      time_unix     TIMESTAMP,\
+      time          TIMESTAMP,\
+      time_unix     DOUBLE PRECISION,\
       result        TEXT,\
       transport     TEXT,\
       response_code SMALLINT,\
@@ -28,19 +30,51 @@ def init_monitoring_table(cfg):
       regexp_found  BOOLEAN,\
       timeout       REAL,\
       period        REAL\
-    ); COMMIT;"
+    );"
+
+  sql += "ALTER TABLE web_monitoring \
+    ADD CONSTRAINT uniq_web_monitoring UNIQUE (\
+    url, time_unix, result);"
+  
+  sql += "CREATE INDEX url_idx_web_monitoring ON web_monitoring (url);"
+  sql += "CREATE INDEX result_idx_web_monitoring ON web_monitoring (result);"
+  sql += "CREATE INDEX response_code_idx_web_monitoring ON \
+    web_monitoring (response_code);"
+  sql += "CREATE INDEX regexp_found_idx_web_monitoring ON \
+    web_monitoring (regexp_found);"
+
+  sql += "COMMIT;"
 
   is_recoverable = False
   apply_to_db(cfg, sql, is_recoverable)  
+  """
+
+def save_reports_to_db(cfg, reports):
+  sql = ""
+  for each_report in reports:
+    r = each_report.value
+    regexp = r.get("regexp")
+    if regexp:
+      regexp = "'" + regexp + "'"
+    else:
+      regexp = "NULL"
+
+    item = "INSERT INTO web_monitoring (url, time, time_unix, result, \
+    transport, response_code, response_time, regexp, regexp_found, timeout, \
+    period) VALUES ('{0}', '{1}', {2}, '{3}', '{4}', {5}, {6}, {7}, {8}, \
+    {9}, {10});\
+    ".format(r.get("url"), r.get("time"), r.get("time_unix"), 
+    r.get("result"), r.get("transport"), r.get("response_code", "NULL"), 
+    r.get("response_time", "NULL"), regexp, r.get("regexp_found", "NULL"), 
+    r.get("timeout"), r.get("period"))
+
+    logger.debug(item)
+    sql += item
+
+  sql += "COMMIT;"
+  apply_to_db(cfg, sql)
 
 
-#def save_reports_to_db(cfg, reports):
-"""
-    for each_report in reports:
-      report = each_report.value
-      logger.info("h")
-"""
-    
 def apply_to_db(cfg, sql, is_recoverable = True):
   logger.debug("Execute SQL script...")
 

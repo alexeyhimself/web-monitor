@@ -23,6 +23,14 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
 
   try:
     time_start = time.time()
+
+    # time must be prior of requests call to be in report in case of failure
+    t = datetime.datetime.fromtimestamp(time_start)
+    report.update({
+      'time': t.strftime("%Y/%m/%d %H:%M:%S"),  # human readable
+      'time_unix': time_start,  # for programs and db's
+    })
+
     r = requests.get(url, timeout=timeout)
     time_end = time.time()
 
@@ -34,10 +42,8 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
     # response_code + transport issues + regexp
     result = 'ok' if r.status_code == 200 else 'fail'
 
-    t = datetime.datetime.fromtimestamp(time_start)
+    
     report.update({
-      'time': t.strftime("%Y/%m/%d %H:%M:%S"),  # human readable
-      'time_unix': time_start,  # for programs and db's
       'transport': 'connected',
       'result': result,
       'response_time': response_time,

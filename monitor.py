@@ -6,7 +6,7 @@ from libs.logger_loader import *
 
 from libs.config_loader import load_config, validate_cfg
 from libs.urls_caller import monitor_url
-from libs.kafka_sender import init_kafka_producer, process_pre_kafka_queue
+from libs.kafka_sender import process_pre_kafka_queue
 
 from multiprocessing import Process, JoinableQueue
 

@@ -1,5 +1,6 @@
 import sys
 import json
+import time
 from kafka import KafkaConsumer
 
 import logging
@@ -24,9 +25,10 @@ def init_kafka_consumer(cfg):
     consumer = KafkaConsumer(
       topic,
       auto_offset_reset="earliest",
+      enable_auto_commit=False,
       bootstrap_servers=server,
-      client_id="demo-client-1",
-      group_id="demo-group",
+      # client_id="demo-client-1",
+      group_id="monitor-group",
       security_protocol="SSL",
       ssl_cafile=kafka_cfg.get("ssl_cafile"),
       ssl_certfile=kafka_cfg.get("ssl_certfile"),
@@ -57,7 +59,7 @@ def backup_kafka_to_db(cfg):
   # and the service is working.
   kafka_reports_cnt = 0
   kafka_polls = 0
-  notify_in_polls = 1
+  notify_in_polls = 10
 
   while True:
     try:
@@ -65,7 +67,7 @@ def backup_kafka_to_db(cfg):
       if report_items:
         for tp, msgs in report_items.items():
           for msg in msgs:
-            logger.debug("Received: {}".format(msg.value))
+            # logger.info("Received: {}".format(msg.value))
             kafka_reports_cnt += 1
 
         kafka_polls += 1
@@ -77,6 +79,7 @@ def backup_kafka_to_db(cfg):
           logger.info(msg)
 
         msg = "Just received from Kafka %s reports." % kafka_reports_cnt
+        kafka_reports_cnt = 0
         logger.info(msg)
       else:
         msg = "Nothing to receive from Kafka yet."
@@ -84,4 +87,5 @@ def backup_kafka_to_db(cfg):
 
     except Exception as why:
       logger.error(str(why), exc_info=True)
+      logger.info("Waiting for a throtling period to allow Kafka to recover.")
       time.sleep(30)  # requests throtling in case of Kafka unavailable

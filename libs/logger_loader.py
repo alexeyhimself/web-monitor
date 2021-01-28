@@ -4,25 +4,14 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("kafka").setLevel(logging.WARNING)
 
+# ld_cfg is a dict from .local_debug (a file that is in .gitignore and 
+# that helps to develop locally and switch parameters without changing
+# source code
+from libs.local_debug_loader import ld_cfg
 
-# .local_debug file that is in .gitignore that helps to distinguish:
-# DEV or PRO machine and provides options for fast switching of configuration.
-# For example, changing log_level (to see what PRO logs will look like to make) 
-# them more comprehensive or add more log details when developing features 
-# without changing this file. 
-import os.path
-from libs.config_loader import load_config
-ld_path = '.local_debug'
-
-if os.path.isfile(ld_path):
-  DEBUG = True
-  ld_cfg = load_config(ld_path)
-else:
-  DEBUG = False
-
+DEBUG = True if ld_cfg else False
 handler = ld_cfg.get("log_handler", "console") if DEBUG == True else "file"
 level = ld_cfg.get("log_level", "DEBUG") if DEBUG == True else "INFO"
-
 
 # Logs output customization and applying
 from logging.config import dictConfig

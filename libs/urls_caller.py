@@ -67,7 +67,7 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
   pre_kafka_queue.put(report)
 
 
-# Calls call_url every period
+# Calls call_url every period. Each period could be defined per URL.
 def monitor_url(each_url, pre_kafka_queue):
   url = each_url.get("url")
   period = each_url.get("period", DEFAULT_PERIOD)

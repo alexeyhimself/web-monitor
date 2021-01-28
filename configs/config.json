@@ -1,6 +1,8 @@
 {
   "monitored_urls": [
-    {"url": "https://google.com"}
+    {"url": "https://google.com"},
+    {"url": "https://yandex.ru", "timeout": 1},
+    {"url": "https://bing.com", "timeout": 10, "period": 30}
   ],
   "kafka": {
     "host": "",

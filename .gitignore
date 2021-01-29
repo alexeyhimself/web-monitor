@@ -4,7 +4,7 @@ lib
 pyvenv.cfg
 *.pyc
 configs/config.dev.json
-*.log
+logs/monitoring.log
 .local_debug
 certs/kafka/ca.dev.pem
 certs/kafka/service.dev.cert

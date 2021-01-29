@@ -1,3 +1,8 @@
+# Describes logger settings and loads these settings. 
+# If .local_debug file exists in project main folder, then by default 
+# logs output to console and log level is DEBUG. If not exists then logs
+# output to ./logs/monitor.log file with log level INFO.
+
 # do not log requests, urllib3, kafka in DEBUG/INFO level
 import logging
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -32,14 +37,12 @@ logging_config = {
   },
   'handlers': {
     'console': {
-      # 'level': 'DEBUG',
       'class': 'logging.StreamHandler',
       'formatter': 'verbose'
     },
     'file': {
-      # 'level': 'DEBUG',
       'class': 'logging.handlers.RotatingFileHandler',
-      'filename': './monitor.log',
+      'filename': './logs/monitor.log',
       'maxBytes': 1024*1024*150,  # 15MB
       'backupCount': 10,
       'formatter': 'verbose'

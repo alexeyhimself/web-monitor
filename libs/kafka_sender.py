@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 # Tries to establish producer connection to Kafka based on config.json params
+# If fails then exits, because it is unrecoverable failure
+# If succeeds returns producer and topic
 def init_kafka_producer(cfg):
   logger.info("Starting Kafka producer connector...")
 
@@ -56,19 +58,13 @@ def dump_queue(queue):
 
 # Every 1 second (buffering_timeout is defined in dump_queue) tries to send 
 # reports from pre-Kafka queue to Kafka. If Kafka is unavailable, tries to 
-# send reports with 30s throtling.
+# send reports with 30s throtling. Never ends.
 def process_pre_kafka_queue(cfg, queue):
   logger.info("Starting pre-Kafka queue processor...")
 
   producer, topic = init_kafka_producer(cfg)
 
   logger.info("Starting pre-Kafka queue processing...")
-
-  # INFO log is silent if everything is fine.
-  # I want to see something in logs sometimes, that everything is fine
-  # and the service is working.
-  kafka_flushes = 0
-  notify_in_flushes = 10
 
   while True:
     try:
@@ -78,14 +74,7 @@ def process_pre_kafka_queue(cfg, queue):
           producer.send(topic, each_report)
 
         producer.flush()
-        kafka_flushes += 1
-
         queue.task_done()
-
-        if kafka_flushes % notify_in_flushes == 0:
-          msg = "Service is alive, "
-          msg += "by this time flushed to Kafka %s times." % kafka_flushes
-          logger.info(msg)
 
         msg = "Just sent to Kafka %s reports." % len(report_items)
         logger.info(msg)
@@ -96,4 +85,4 @@ def process_pre_kafka_queue(cfg, queue):
     except Exception as why:
       logger.error(str(why), exc_info=True)
       logger.info("Waiting for a throtling period to allow Kafka to recover.")
-      time.sleep(30)  # requests throtling in case of Kafka unavailable
+      time.sleep(10)  # requests throtling in case of Kafka unavailable

@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 # Tries to establish consumer connection to Kafka based on config.json params
+# If fails then exits, because it is unrecoverable failure
+# If succeeds then returns cunsumer and topic
 def init_kafka_consumer(cfg):
   logger.info("Starting Kafka consumer connector...")
 
@@ -26,11 +28,11 @@ def init_kafka_consumer(cfg):
   try:
     consumer = KafkaConsumer(
       topic,
-      auto_offset_reset="latest",
+      auto_offset_reset="earliest",
       enable_auto_commit=False,
       bootstrap_servers=server,
       client_id="web-monitor-client-1",
-      group_id="web-monitor-group",
+      group_id="web-monitor-group-1",
       security_protocol="SSL",
       ssl_cafile=kafka_cfg.get("ssl_cafile"),
       ssl_certfile=kafka_cfg.get("ssl_certfile"),
@@ -40,7 +42,7 @@ def init_kafka_consumer(cfg):
 
     consumer.poll(timeout_ms=1000)  # initial call will assign partitions
                                     # without retreiving anything and commits
-    return consumer
+    return consumer, topic
 
   except Exception as why:
     logger.critical(str(why), exc_info=True)
@@ -49,43 +51,25 @@ def init_kafka_consumer(cfg):
 
 # Every 1 second (timeout_ms is defined in consumer.poll) tries to poll 
 # reports from Kafka queue. If Kafka is unavailable, tries to 
-# poll reports with 30s throtling.
+# poll reports with throtling timeout (10s). Never ends.
 def backup_kafka_to_db(cfg):
   logger.info("Starting Kafka to PostgreSQL backup...")
 
-  consumer = init_kafka_consumer(cfg)
+  consumer, topic = init_kafka_consumer(cfg)
 
   logger.info("Starting Kafka queue processing...")
-
-  # INFO log is silent if everything is fine.
-  # I want to see something in logs sometimes, that everything is fine
-  # and the service is working.
-  kafka_polls = 0
-  notify_in_polls = 10
-  kafka_reports_cnt = 0
 
   while True:
     try:
       report_items = consumer.poll(timeout_ms=1000)
       if report_items:
+        logger.info("Just received from Kafka reports.")
         for tp, msgs in report_items.items():
-          save_reports_to_db(cfg, msgs)
-          kafka_reports_cnt = len(msgs)
+          save_reports_to_db(cfg, msgs, topic)
+          consumer.commit()  # commit only if DB saved without errors
 
-        kafka_polls += 1
-        consumer.commit()
-
-        if kafka_polls % notify_in_polls == 0:
-          msg = "Service is alive, by this time "
-          msg += "received from Kafka %s polls." % kafka_polls
-          logger.info(msg)
-
-        msg = "Just received from Kafka %s reports." % kafka_reports_cnt
-        kafka_reports_cnt = 0
-        logger.info(msg)
       else:
-        msg = "Nothing to receive from Kafka yet."
-        logger.info(msg)
+        logger.info("Nothing received from Kafka yet.")
 
     except Exception as why:
       logger.error(str(why), exc_info=True)

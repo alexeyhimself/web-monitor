@@ -1,4 +1,4 @@
-# Web-Monitor Service
+Web-Monitor Service
 ===========================
 A Python app that periodically checks availability of specified HTTP(S) URL(s), forms JSON reports on those monitoring results, puts those reports to Kafka, and polls Kafka to store those reports in PostgreSQL DBMS.
 
@@ -14,7 +14,7 @@ Service runs forever and checks specified URL(s) for their reply within specifie
 * PostgreSQL service is up and running
 
 ## How to install
-Clone source code and install dependencies:
+### Clone source code and install dependencies:
 ```
 # get source code
 git clone https://github.com/alexeyhimself/web-monitor.git
@@ -28,17 +28,14 @@ source bin/activate
 pip3 install -r install/requirements.txt
 ```
 
-## Kafka topic
+### Create Kafka topic
 Create Kafka `topic`.
 
-## DB schema
+### Create monitoring table in DB
 Connect to PostgreSQL with your favorite client and apply SQL commands from `install/init_monitoring_db.sql` file.
 
-## Certificates
-* put `ca.pem`, `service.cert`, `service.key` Kafka certificates to `certs/kafka`
-* put `ca.pem` Postgres certificate to `certs/db`
-
-## Update `configs/config.json`, fill all the parameters for Kafka and Postgres:
+### Update config.json
+- Update `configs/config.json`, fill all the parameters for Kafka and Postgres:
 ```json
 {
   "kafka": {
@@ -60,8 +57,7 @@ Connect to PostgreSQL with your favorite client and apply SQL commands from `ins
   }
 }
 ```
-
-## Update `configs/config.json`, change monitoring URL(s) to your server(s):
+- Update `configs/config.json`, change monitoring URL(s) to your server(s):
 ```json
 {
   "monitored_urls": [
@@ -75,7 +71,7 @@ Mandatory parameter - is `url`. Other parameters are optional:
 * `timeout` [seconds], default: 10 - maximum time to wait request's response. If exceeded then request is considered as failed due to timeout;
 * `period` [seconds], default: 60 - time between two consecutive monitoring requests. Must be greater than `timeout`.
 
-## Starting server
+## Start monitoring server
 In `web-monitor` folder run:
 ```
 python3 monitor.py
@@ -85,15 +81,17 @@ python3 monitor.py
 Service logs messages by default to `logs/monitor.log`. But it can log to console as well.
 
 ## Help for developers
-If you create `.local_debug` file in `web-monitor` folder (it is already in .gitignore) then logs will be redirected from file to console. Logs will have INFO level if you add in `.local_debug` the following structure:
+If you create `.local_debug` file in `web-monitor` folder (it is already in .gitignore) then logs will be redirected from file to console. 
+Logs will have INFO level if you add in `.local_debug` the following structure:
 ```
 {
     "log_level": "INFO"
 }
 ```
+Extend this file for your needs.
 
-## How to run autotests
-In `web-monitor` folder run:
+## Autotests
+To execute autotests in `web-monitor` folder run a command:
 ```
 pytest
 ```

@@ -1,7 +1,9 @@
 import re
 import sys
-import time, datetime
+import time
 import requests
+
+from datetime import datetime
 
 import logging
 logger = logging.getLogger(__name__)
@@ -14,57 +16,50 @@ from libs.config_loader import DEFAULT_TIMEOUT, DEFAULT_PERIOD
 # puts that report to pre-Kafka queue. In case of unrecoverable failure
 # sys.exit()'s
 def call_url(url, timeout, period, regexp, pre_kafka_queue):
+  time_start = datetime.utcnow()
+
   report = {
     'url': url,
     'timeout': timeout,
-    'period': period
+    'period': period,
+    'event_date': str(time_start)
   }
 
   try:
-    time_start = time.time()
-
-    # time must be prior of requests call to be in report in case of failure
-    t = datetime.datetime.fromtimestamp(time_start)
-    report.update({
-      'time': t.strftime("%Y/%m/%d %H:%M:%S"),  # human readable
-      'time_unix': time_start,  # for programs and db's
-    })
-
     r = requests.get(url, timeout=timeout)
-    time_end = time.time()
+    time_end = datetime.utcnow()
 
     # if OS time sync will happen during request and will be corrected back
     # then diff may become < 0! Many if's but may happen in long time use.
-    response_time = round(time_end - time_start, 3)
+    response_time = round((time_end - time_start).microseconds / 1000000, 3)
 
     # overall result to look at, aggregates: 
     # response_code + transport issues + regexp
-    result = 'ok' if r.status_code == 200 else 'fail'
-
+    is_fine = True if r.status_code == 200 else False
     
     report.update({
       'transport': 'connected',
-      'result': result,
+      'is_fine': is_fine,
       'response_time': response_time,
       'response_code': r.status_code
     })    
 
     # If HTTP 200 OK and regexp was assigned, then search for regexp and 
-    # redefine result based on that search.
+    # redefine is_fine based on that search.
     if regexp and r.status_code == 200:
       regexp_found = True if re.search(regexp, r.text) else False
-      result = 'ok' if regexp_found == True else 'fail'
+      is_fine = True if regexp_found == True else False
 
       report.update({
         'regexp': regexp,
         'regexp_found': regexp_found,
-        'result': result
+        'is_fine': is_fine
       })
 
   except requests.exceptions.ConnectionError:
-    report.update({'transport': 'conn_error', 'result': 'fail'})
+    report.update({'transport': 'conn_error', 'is_fine': False})
   except requests.exceptions.Timeout:
-    report.update({'transport': 'conn_timeout', 'result': 'fail'})
+    report.update({'transport': 'conn_timeout', 'is_fine': False})
   except Exception as why:
     logger.error(report)
     logger.critical(why, exc_info=True)

@@ -1,24 +1,67 @@
 # Web-Monitor Service
+===========================
+A Python app that periodically checks availability of specified HTTP(S) URL(s), forms JSON reports on those monitoring results, puts those reports to Kafka, and polls Kafka to store those reports in PostgreSQL DBMS.
 
-## About
-Python app that checks availability of specified HTTP service. It runs forever and checks specified URL(s) for reply within specified timeout and with specified period.
-* If service is HTTP(S) available, then HTTP(S) response code will be printed to stdio.
-* If service is HTTP(S) unavailable, then either ConnectionError or Timeout error will be printed to stdio.
-* If any other error will occur, reason will be printed to stdio.
+Service runs forever and checks specified URL(s) for their reply within specified timeout and with specified period. A few basic failover procedres implemented:
+* producer uses multiprocessing.Queues to put monitoring reports there before sending them to Kafka. That's why, if Kafka service is unavailable for a while, it applies throtling mechanism of Kafka availability polling and continues to keep reports in Queue.
+* consumer has Kafka polling failover mechanism: if Kafka becomes unavailable, it applies throtling mechanism of Kafka availability polling.
+* consumer Kafka commit depends on DBMS commit: if DBMS due to any reason can't save polled Kafka reports, consumer does not commit to Kafka and applies throtling mechanism of DBMS availability polling.
+
+
+# Getting Started
+## Prerequisites
+* Kafka service is up and running
+* PostgreSQL service is up and running
 
 ## How to install
-Download installation file and run it:
+Clone source code and install dependencies:
 ```
-wget -N https://raw.githubusercontent.com/alexeyhimself/web-monitor/main/install/install.sh && sh install.sh
+# get source code
+git clone https://github.com/alexeyhimself/web-monitor.git
+
+# init virtualenv
+python3 -m venv ./web-monitor/
+cd ./web-monitor/
+source bin/activate
+
+# install required python libs
+pip3 install -r install/requirements.txt
 ```
 
-## How to use
-In `web-monitor` folder run:
+## Kafka topic
+Create Kafka `topic`.
+
+## DB schema
+Connect to PostgreSQL with your favorite client and apply SQL commands from `install/init_monitoring_db.sql` file.
+
+## Certificates
+* put `ca.pem`, `service.cert`, `service.key` Kafka certificates to `certs/kafka`
+* put `ca.pem` Postgres certificate to `certs/db`
+
+## Update `configs/config.json`, fill all the parameters for Kafka and Postgres:
+```json
+{
+  "kafka": {
+    "host": "",
+    "port": "19071",
+    "topic": "",
+    "ssl_cafile": "certs/kafka/ca.pem",
+    "ssl_certfile": "certs/kafka/service.cert",
+    "ssl_keyfile": "certs/kafka/service.key"
+  },
+  "db": {
+    "host": "",
+    "port": "19069",
+    "db_name": "",
+    "user": "",
+    "password": "",
+    "sslmode": "require",
+    "sslrootcert": "certs/db/ca.pem",
+  }
+}
 ```
-python3 monitor.py
-```
-This will start monitoring of "https://google.com" with the period of 60 seconds.
-To set your own URL(s) of monitored service(s) and their optional parameters, adjust `config.json` file:
+
+## Update `configs/config.json`, change monitoring URL(s) to your server(s):
 ```json
 {
   "monitored_urls": [
@@ -32,8 +75,24 @@ Mandatory parameter - is `url`. Other parameters are optional:
 * `timeout` [seconds], default: 10 - maximum time to wait request's response. If exceeded then request is considered as failed due to timeout;
 * `period` [seconds], default: 60 - time between two consecutive monitoring requests. Must be greater than `timeout`.
 
+## Starting server
+In `web-monitor` folder run:
+```
+python3 monitor.py
+```
 
-## Run autotests
+## Logs
+Service logs messages by default to `logs/monitor.log`. But it can log to console as well.
+
+## Help for developers
+If you create `.local_debug` file in `web-monitor` folder (it is already in .gitignore) then logs will be redirected from file to console. Logs will have INFO level if you add in `.local_debug` the following structure:
+```
+{
+    "log_level": "INFO"
+}
+```
+
+## How to run autotests
 In `web-monitor` folder run:
 ```
 pytest

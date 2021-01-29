@@ -50,7 +50,6 @@ def start_monitor():
 
 
 from libs.kafka_receiver import init_kafka_consumer, backup_kafka_to_db
-from libs.db_sender import init_monitoring_table
 
 
 def start_kafka_to_db():
@@ -58,7 +57,6 @@ def start_kafka_to_db():
 
   cfg = load_config()
   validate_cfg(cfg)
-  init_monitoring_table(cfg)
   backup_kafka_to_db(cfg)
 
 

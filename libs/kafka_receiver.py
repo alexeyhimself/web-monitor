@@ -45,7 +45,9 @@ def init_kafka_consumer(cfg):
     return consumer, topic
 
   except Exception as why:
-    logger.critical(str(why), exc_info=True)
+    msg = "Monitor service will not be started! \n"
+    msg += "Could not init producer due to an error: "
+    logger.critical(msg, exc_info=True)
     sys.exit()  # exit, because unrecoverable failure
 
 

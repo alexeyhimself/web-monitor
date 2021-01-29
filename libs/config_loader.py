@@ -12,6 +12,12 @@ CONFIG_PATH_DEV = 'configs/config.dev.json'
 cp = CONFIG_PATH_DEV if os.path.isfile(CONFIG_PATH_DEV) else CONFIG_PATH
 
 
+def critical_exit(msg):
+    m = "Service will not be started!\n" + msg
+    logger.critical(m, exc_info=True)
+    sys.exit()
+
+
 def load_config(cfg_path = cp):
   logger.info("Loading monitor service config...")
 
@@ -22,9 +28,8 @@ def load_config(cfg_path = cp):
     return cfg
 
   except Exception as why:
-    err_msg = "Could not load config file due to an error! " + str(why)
-    logger.critical(err_msg, exc_info=True)
-    sys.exit()  # exit, because unrecoverable failure
+    msg = "Could not load config file due to an error: " + str(why)
+    critical_exit(msg)  # exit, because unrecoverable failure
 
 
 DEFAULT_TIMEOUT = 10  # time to wait request response [seconds]
@@ -46,22 +51,17 @@ def validate_cfg(cfg):
       if not (isinstance(period, int) or isinstance(period, float)):
         msg = "Period must be integer or float. "
         msg += "But for %s it is not: %s. " % (url, period)
-        logger.critical(msg, exc_info=True)
-        sys.exit()  # exit, because unrecoverable failure
+        critical_exit(msg)  # exit, because unrecoverable failure
 
       if not (isinstance(timeout, int) or isinstance(timeout, float)):
         msg = "Timeout must be integer or float. "
         msg += "But for %s it is not: %s. " % (url, timeout)
-        logger.critical(msg, exc_info=True)
-        sys.exit()  # exit, because unrecoverable failure
+        critical_exit(msg)  # exit, because unrecoverable failure
 
       if timeout > period:
         msg = "Timeout can't be greater than period. "
         msg += "But for %s it is: %s > %s. " % (url, timeout, period)
-        logger.critical(msg, exc_info=True)
-        sys.exit()  # exit, because unrecoverable failure
+        critical_exit(msg)  # exit, because unrecoverable failure
   else:
     msg = "No URL(s) to monitor in config.json. "
-    msg += "Monitor service will not be started!"
-    logger.critical(msg, exc_info=True)
-    sys.exit()  # exit, because unrecoverable failure
+    critical_exit(msg)  # exit, because unrecoverable failure

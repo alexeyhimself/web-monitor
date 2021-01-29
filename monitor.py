@@ -14,7 +14,8 @@ from multiprocessing import Process, JoinableQueue
 
 # Starts Monitor service: loads and validates config, starts monitors processes 
 # (process per URL), starts pre-Kafka queue and starts that queue processor 
-# (Kafka producer)
+# (Kafka producer).
+# If any init procedure fails, service exits with reason description in logs.
 def start_monitor():
   logger.info("Starting monitor service...")
 
@@ -49,7 +50,7 @@ def start_monitor():
   """
 
 
-from libs.kafka_receiver import init_kafka_consumer, backup_kafka_to_db
+from libs.kafka_receiver import backup_kafka_to_db
 
 
 def start_kafka_to_db():

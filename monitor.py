@@ -16,11 +16,8 @@ from multiprocessing import Process, JoinableQueue
 # (process per URL), starts pre-Kafka queue and starts that queue processor 
 # (Kafka producer).
 # If any init procedure fails, service exits with reason description in logs.
-def start_monitor():
+def start_monitor(cfg):
   logger.info("Starting monitor service...")
-
-  cfg = load_config()
-  validate_cfg(cfg)
 
   # init queue for storing monitoring records before sending them to kafka 
   # (in order not to loose monitoring data if kafka unavailable)
@@ -53,16 +50,28 @@ def start_monitor():
 from libs.kafka_receiver import backup_kafka_to_db
 
 
-def start_kafka_to_db():
+def start_kafka_to_db(cfg):
   logger.info("Starting Kafka to PostgreSQL backup service...")
 
-  cfg = load_config()
-  validate_cfg(cfg)
   backup_kafka_to_db(cfg)
 
 
 if __name__ == '__main__':
-  if ld_cfg.get("service") == "backup":
-    start_kafka_to_db()
+  cfg = load_config()
+  validate_cfg(cfg)
+
+  # .local_debug's mode priority
+  dev_mode = ld_cfg.get("mode")
+  if dev_mode:
+    if dev_mode == "backup":
+      start_kafka_to_db(cfg)
+    elif dev_mode == "monitor":
+      start_monitor(cfg)
+
   else:
-    start_monitor()
+    mode = cfg.get("mode")
+    if mode == "backup":
+      start_kafka_to_db(cfg)
+    elif mode == "monitor":
+      start_monitor(cfg)
+

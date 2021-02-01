@@ -1,4 +1,5 @@
 {
+  "mode": "monitor",
   "monitored_urls": [
     {"url": "https://google.com"},
     {"url": "https://yandex.ru", "timeout": 1},
@@ -19,6 +20,6 @@
     "user": "",
     "password": "",
     "sslmode": "require",
-    "sslrootcert": "certs/db/ca.pem",
+    "sslrootcert": "certs/db/ca.pem"
   }
 }

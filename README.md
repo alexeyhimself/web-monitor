@@ -1,6 +1,6 @@
 Web-Monitor Service
 ===========================
-A Python app that periodically checks availability of specified HTTP(S) URL(s), forms JSON reports on those monitoring results, puts those reports to Kafka, and polls Kafka to store those reports in PostgreSQL DBMS.
+A Python app that periodically checks availability of specified HTTP(S) URL(s), forms JSON reports on those monitoring results, puts those reports to Kafka, and polls Kafka to store those reports in PostgreSQL DBMS. App can work in 2 modes: as `monitor` and as `backup` service.
 
 Service runs forever and checks specified URL(s) for their reply within specified timeout and with specified period. A few basic failover procedres implemented:
 * producer uses multiprocessing.Queues to put monitoring reports there before sending them to Kafka. That's why, if Kafka service is unavailable for a while, it applies throtling mechanism of Kafka availability polling and continues to keep reports in Queue.
@@ -35,6 +35,12 @@ Create Kafka `topic`.
 Connect to PostgreSQL with your favorite client and apply SQL commands from `install/init_monitoring_db.sql` file.
 
 ### Update config.json
+- Update `configs/config.json`, set `mode` of your service: `monitor` or `backup`:
+```json
+{
+  "mode": "monitor"
+}
+```
 - Update `configs/config.json`, fill all the parameters for Kafka and Postgres:
 ```json
 {

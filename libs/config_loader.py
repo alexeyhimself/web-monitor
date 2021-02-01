@@ -39,29 +39,53 @@ DEFAULT_PERIOD = 60  # time between two consecutive requests [seconds]
 def validate_cfg(cfg):
   logger.info("Starting config validation...")
 
-  monitored_urls = cfg.get("monitored_urls", [])
+  if isinstance(cfg, dict):
+    mode = cfg.get("mode")
+    monitored_urls = cfg.get("monitored_urls", [])
+    kafka = cfg.get("kafka")
+    db = cfg.get("db")
 
-  if monitored_urls:
-    for each_url in monitored_urls:
-      url = each_url.get("url")
-      period = each_url.get("period", DEFAULT_PERIOD)
-      timeout = each_url.get("timeout", DEFAULT_TIMEOUT)
-      regexp = each_url.get("regexp")
+    if not kafka:
+      msg = "Service config must contain kafka settings. But it has not. "
+      critical_exit(msg)  # exit, because unrecoverable failure
 
-      if not (isinstance(period, int) or isinstance(period, float)):
-        msg = "Period must be integer or float. "
-        msg += "But for %s it is not: %s. " % (url, period)
-        critical_exit(msg)  # exit, because unrecoverable failure
+    if not mode:
+      msg = "Service config must contain mode. But it has not. "
+      critical_exit(msg)  # exit, because unrecoverable failure
 
-      if not (isinstance(timeout, int) or isinstance(timeout, float)):
-        msg = "Timeout must be integer or float. "
-        msg += "But for %s it is not: %s. " % (url, timeout)
-        critical_exit(msg)  # exit, because unrecoverable failure
+    if not (monitored_urls or db):
+      msg = "Service config must contain monitored_urls or db settings. But it has not. "
+      critical_exit(msg)  # exit, because unrecoverable failure
 
-      if timeout > period:
-        msg = "Timeout can't be greater than period. "
-        msg += "But for %s it is: %s > %s. " % (url, timeout, period)
-        critical_exit(msg)  # exit, because unrecoverable failure
+    if monitored_urls:
+      for each_url in monitored_urls:
+        url = each_url.get("url")
+        period = each_url.get("period", DEFAULT_PERIOD)
+        timeout = each_url.get("timeout", DEFAULT_TIMEOUT)
+        regexp = each_url.get("regexp")
+
+        if not url:
+          msg = "URL parameter is mandatory for monitored_urls! "
+          msg += "But for %s it is not set. " % url
+          critical_exit(msg)  # exit, because unrecoverable failure
+
+        if not (isinstance(period, int) or isinstance(period, float)):
+          msg = "Period must be integer or float. "
+          msg += "But for %s it is not: %s. " % (url, period)
+          critical_exit(msg)  # exit, because unrecoverable failure
+
+        if not (isinstance(timeout, int) or isinstance(timeout, float)):
+          msg = "Timeout must be integer or float. "
+          msg += "But for %s it is not: %s. " % (url, timeout)
+          critical_exit(msg)  # exit, because unrecoverable failure
+
+        if timeout > period:
+          msg = "Timeout can't be greater than period. "
+          msg += "But for %s it is: %s > %s. " % (url, timeout, period)
+          critical_exit(msg)  # exit, because unrecoverable failure
+    else:
+      msg = "No URL(s) to monitor in config.json. "
+      critical_exit(msg)  # exit, because unrecoverable failure
   else:
-    msg = "No URL(s) to monitor in config.json. "
+    msg = "Config must be dict/json object. But it is not. "
     critical_exit(msg)  # exit, because unrecoverable failure

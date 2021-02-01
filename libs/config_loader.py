@@ -83,9 +83,8 @@ def validate_cfg(cfg):
           msg = "Timeout can't be greater than period. "
           msg += "But for %s it is: %s > %s. " % (url, timeout, period)
           critical_exit(msg)  # exit, because unrecoverable failure
-    else:
-      msg = "No URL(s) to monitor in config.json. "
-      critical_exit(msg)  # exit, because unrecoverable failure
+    else:  # db
+      pass
   else:
     msg = "Config must be dict/json object. But it is not. "
     critical_exit(msg)  # exit, because unrecoverable failure

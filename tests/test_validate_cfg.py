@@ -41,7 +41,7 @@ def test_loads_valid_monitor_config():
 
 def test_load_config_wo_path_param():
 	cfg = load_config()
-	assert isinstance(cfg, "dict") == True
+	assert isinstance(cfg, dict) == True
 
 
 invalid_cfgs_paths = [
@@ -52,7 +52,7 @@ invalid_cfgs_paths = [
 	"tests/test_validate_cfg.py",  # path exists, but content is not json
 ]
 @pytest.mark.parametrize("cfg_path", invalid_cfgs_paths)
-def test_load_config_wo_path_param(cfg_path):
+def test_load_config_w_invalid_path_param(cfg_path):
   with pytest.raises(SystemExit) as pytest_wrapped_e:
     load_config(cfg_path)
   assert pytest_wrapped_e.type == SystemExit

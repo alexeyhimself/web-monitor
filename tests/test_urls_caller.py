@@ -34,3 +34,15 @@ def test_conn_error_on_unavailable_url(url):
 
   assert report.get('transport') == 'conn_error'
   assert report.get('is_fine') == False
+
+
+def test_conn_timeout_on_url():
+  pre_kafka_queue = JoinableQueue()
+  # Used https://requests.readthedocs.io/en/master/user/advanced/#timeouts
+  # to set timeout as a tuple: (connect timeout, read timeout)
+  # and to get "read timeout" error
+  call_url("http://google.com", (5, 0.000001), 10, None, pre_kafka_queue)
+  report = pre_kafka_queue.get()
+
+  assert report.get('transport') == 'conn_timeout'
+  assert report.get('is_fine') == False

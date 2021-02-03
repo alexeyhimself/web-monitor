@@ -13,12 +13,12 @@ def to_sql(item):
   if item:
     if isinstance(item, str):
       return "'" + item + "'"
-    else:  # number, for example
+    else:  # True, number != 0 for example
       return str(item)
   else:
-    if item is None:
+    if item is None:  # special value
       return "NULL"
-    else:  # boolean for example
+    else:  # False, number == 0 for example
       return str(item)
 
 

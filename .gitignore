@@ -15,7 +15,7 @@ certs/kafka/service.dev.cert
 certs/kafka/service.dev.key
 certs/db/ca.dev.pem
 
-.coverage
+.coverage*
 
 .DS_Store
 

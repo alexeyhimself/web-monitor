@@ -12,7 +12,7 @@ invalid_cfgs = [
 	{"abc": True},
 	# mandatory keys exist, but value is empty list:
 	{"kafka": {"abc": True}},
-  {"mode": {"abc": True}},
+    {"mode": {"abc": True}},
 	{"mode": "abc", "monitored_urls": [], "kafka": {"abc": True}},
 	{"mode": "abc", "monitored_urls": [{"abc": True}], "kafka": {}},
 	{"mode": "abc", "db": {"abc": True}, "kafka": {}},

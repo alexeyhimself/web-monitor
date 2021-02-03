@@ -39,7 +39,7 @@ from attrdict import AttrDict
 def get_db_cfg():
   cfg = load_config()
   validate_cfg(cfg)
-  return cfg.get("db_test", {})
+  return cfg.get("db_pytest", {})
 
 
 def test_apply_to_db_works():

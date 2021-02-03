@@ -12,7 +12,8 @@ logging.getLogger("kafka").setLevel(logging.WARNING)
 # ld_cfg is a dict from .local_debug (a file that is in .gitignore and 
 # that helps to develop locally and switch parameters without changing
 # source code
-from libs.local_debug_loader import ld_cfg
+from libs.local_debug_loader import load_local_debug
+ld_cfg = load_local_debug()
 
 DEBUG = True if ld_cfg else False
 handler = ld_cfg.get("log_handler", "console") if DEBUG == True else "file"

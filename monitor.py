@@ -11,6 +11,8 @@ from libs.local_debug_loader import ld_cfg
 
 from multiprocessing import Process, JoinableQueue
 
+import signal, sys
+
 
 # Starts Monitor service: loads and validates config, starts monitors processes 
 # (process per URL), starts pre-Kafka queue and starts that queue processor 
@@ -56,7 +58,14 @@ def start_kafka_to_db(cfg):
   backup_kafka_to_db(cfg)
 
 
+def keyboard_interruption_handler(signum, frame):
+  logger.info("Monitor service process has been stopped.")
+  sys.exit()
+
+
 if __name__ == '__main__':
+  signal.signal(signal.SIGINT, keyboard_interruption_handler)
+
   cfg = load_config()
   validate_cfg(cfg)
 

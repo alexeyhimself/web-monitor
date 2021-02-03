@@ -113,7 +113,8 @@ def test_response_code_not_200():
 import signal
 
 # Used https://docs.python.org/3/library/signal.html
-def test_response_code_200():
+@pytest.mark.slow  # marked as slow because of 3 seconds wait
+def test_monitor_url_works():
   pre_kafka_queue = JoinableQueue()
 
   signal.signal(signal.SIGALRM, exit)

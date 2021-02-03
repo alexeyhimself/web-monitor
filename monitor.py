@@ -7,7 +7,7 @@ from libs.logger_loader import *
 from libs.config_loader import load_config, validate_cfg
 from libs.urls_caller import monitor_url
 from libs.kafka_sender import process_pre_kafka_queue
-from libs.local_debug_loader import ld_cfg
+from libs.local_debug_loader import load_local_debug
 
 from multiprocessing import Process, JoinableQueue
 
@@ -69,6 +69,7 @@ if __name__ == '__main__':
   cfg = load_config()
   validate_cfg(cfg)
 
+  ld_cfg = load_local_debug()
   # .local_debug's mode priority
   dev_mode = ld_cfg.get("mode")
   if dev_mode:

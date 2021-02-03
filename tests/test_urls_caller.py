@@ -25,10 +25,13 @@ def test_sys_exits_on_invalid_url(url):
 
 
 unavailable_urls = [
-  "http://a",
-  "https://ljnlkjhkjlhpiuyu896ohuih87t6798.no"
+  "http://a",  # invalid URL
+  "https://ljnlkjhkjlhpiuyu896ohuih87t6798.no"  # valid but unavailabale URL
 ]
-@pytest.mark.slow
+@pytest.mark.slow  # slow and can't overcome due to 
+                   # https://stackoverflow.com/questions/17782142/why-doesnt-requests-get-return-what-is-the-default-timeout-that-requests-get
+                   # requests.get('http://a.ru', timeout=(1,1)) takes more 
+                   # than 1 second (5-6 sec) to halt on connection timeout
 @pytest.mark.parametrize("url", unavailable_urls)
 def test_conn_error_on_unavailable_url(url):
   pre_kafka_queue = JoinableQueue()
@@ -92,7 +95,7 @@ def test_response_code_200():
   assert report.get('transport') == 'connected'
   assert report.get('is_fine') == True
 
-@pytest.mark.dev_now
+
 def test_response_code_not_200():
   url = 'http://test.com'
   pre_kafka_queue = JoinableQueue()

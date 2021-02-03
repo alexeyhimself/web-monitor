@@ -25,10 +25,10 @@ def to_sql(item):
 # Gets decoded reports list of dicts from Kafka and tries to save them all
 # in DB under the same transaction. If transaction fails, exception is passed
 # to a caller function, whole reports list is not commited.
-def save_reports_to_db(cfg, reports, topic):
+def save_reports_to_db(db_cfg, reports, topic):
   msg = "Saving to DB %s reports..." % len(reports)
   logger.info(msg)
-          
+
   table_cols = ["topic", "url", "event_date", "is_fine", "transport", 
   "response_code", "response_time", "regexp", "regexp_found", 
   "timeout", "period", "date_created"]
@@ -52,16 +52,14 @@ def save_reports_to_db(cfg, reports, topic):
     sql += item
 
   sql += "COMMIT;"
-  apply_to_db(cfg, sql)
+  apply_to_db(db_cfg, sql)
 
 
 # Establishes connection to DB and executes given sql on DB
 # If exception, then it is passed to a caller function
 # Used materials from: https://khashtamov.com/ru/postgresql-python-psycopg2
-def apply_to_db(cfg, sql):
+def apply_to_db(db_cfg, sql):
   logger.debug("Execute SQL script...")
-
-  db_cfg = cfg.get("db", {})  
 
   # All connectivity and transport exceptions will handled by the upper level 
   # try-catch, because commit to DB must be synced with commit to Kafka

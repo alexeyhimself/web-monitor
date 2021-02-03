@@ -21,5 +21,14 @@
     "password": "",
     "sslmode": "require",
     "sslrootcert": "certs/db/ca.pem"
+  },
+  "db_pytest": {
+    "host": "",
+    "port": "19069",
+    "db_name": "",
+    "user": "",
+    "password": "",
+    "sslmode": "require",
+    "sslrootcert": "certs/db/ca.pem"
   }
 }

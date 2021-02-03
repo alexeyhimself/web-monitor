@@ -58,6 +58,7 @@ def backup_kafka_to_db(cfg):
   logger.info("Starting Kafka to PostgreSQL backup...")
 
   consumer, topic = init_kafka_consumer(cfg)
+  db_cfg = cfg.get("db", {})
 
   logger.info("Starting Kafka queue processing...")
 
@@ -67,7 +68,7 @@ def backup_kafka_to_db(cfg):
       if report_items:
         logger.info("Just received from Kafka reports.")
         for tp, msgs in report_items.items():
-          save_reports_to_db(cfg, msgs, topic)
+          save_reports_to_db(db_cfg, msgs, topic)
           consumer.commit()  # commit only if DB saved without errors
 
       else:

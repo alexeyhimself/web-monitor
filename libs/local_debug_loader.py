@@ -8,7 +8,7 @@ from libs.config_loader import load_config
 ld_path = '.local_debug'
 
 
-def load_local_debug(ld_path):
+def load_local_debug(ld_path = ld_path):
   if os.path.isfile(ld_path):
     return load_config(ld_path)
   else:

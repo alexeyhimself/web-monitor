@@ -97,9 +97,13 @@ Logs will have INFO level if you add in `.local_debug` the following structure:
 Extend this file for your needs.
 
 ## Autotests
-To execute autotests in `web-monitor` folder run a command:
+- To execute autotests in `web-monitor` folder run a command:
 ```
 pytest
+```
+- To view test-coverage in `web-monitor` folder run a command:
+```
+pytest --cov=libs/
 ```
 
 ## License

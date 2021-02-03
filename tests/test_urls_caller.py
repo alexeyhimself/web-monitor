@@ -107,7 +107,7 @@ def test_response_code_not_200():
   assert report.get('is_fine') == False
 
 
-import signal, sys
+import signal
 # Used https://docs.python.org/3/library/signal.html
 @pytest.mark.dev_now
 def test_response_code_200():
@@ -117,7 +117,7 @@ def test_response_code_200():
   with requests_mock.Mocker() as m:
     m.get(url, text='content')
 
-  signal.signal(signal.SIGALRM, sys.exit)
+  signal.signal(signal.SIGALRM, exit)
   signal.alarm(3)
 
   mon = {'url': url, 'timeout': 0.5, 'period': 1}

@@ -57,7 +57,7 @@ def test_regexp_not_found():
 
   with requests_mock.Mocker() as m:
     m.get(url, text='content')
-  call_url(url, 1, 10, 'not found', pre_kafka_queue)
+    call_url(url, 1, 10, 'not found', pre_kafka_queue)
 
   report = pre_kafka_queue.get()
 
@@ -71,7 +71,7 @@ def test_regexp_found():
 
   with requests_mock.Mocker() as m:
     m.get(url, text='content')
-  call_url(url, 1, 10, 'ten', pre_kafka_queue)
+    call_url(url, 1, 10, 'ten', pre_kafka_queue)
 
   report = pre_kafka_queue.get()
 
@@ -85,21 +85,21 @@ def test_response_code_200():
 
   with requests_mock.Mocker() as m:
     m.get(url, text='content')
-  call_url(url, 1, 10, None, pre_kafka_queue)
+    call_url(url, 1, 10, None, pre_kafka_queue)
 
   report = pre_kafka_queue.get()
 
   assert report.get('transport') == 'connected'
   assert report.get('is_fine') == True
 
-
+@pytest.mark.dev_now
 def test_response_code_not_200():
   url = 'http://test.com'
   pre_kafka_queue = JoinableQueue()
 
   with requests_mock.Mocker() as m:
     m.get(url, text='content', status_code=500)
-  call_url(url, 1, 10, None, pre_kafka_queue)
+    call_url(url, 1, 10, None, pre_kafka_queue)
 
   report = pre_kafka_queue.get()
 
@@ -108,21 +108,21 @@ def test_response_code_not_200():
 
 
 import signal
+
 # Used https://docs.python.org/3/library/signal.html
-@pytest.mark.dev_now
 def test_response_code_200():
   pre_kafka_queue = JoinableQueue()
+
+  signal.signal(signal.SIGALRM, exit)
+  signal.alarm(3)
 
   url = 'http://test.com'
   with requests_mock.Mocker() as m:
     m.get(url, text='content')
 
-  signal.signal(signal.SIGALRM, exit)
-  signal.alarm(3)
-
-  mon = {'url': url, 'timeout': 0.5, 'period': 1}
-  with pytest.raises(Exception) as pytest_wrapped_e:
-    monitor_url(mon, pre_kafka_queue)
-  assert pytest_wrapped_e.type == TypeError
+    mon = {'url': url, 'timeout': 0.5, 'period': 1}
+    with pytest.raises(Exception) as pytest_wrapped_e:
+      monitor_url(mon, pre_kafka_queue)
+    assert pytest_wrapped_e.type == TypeError
 
   signal.alarm(0)

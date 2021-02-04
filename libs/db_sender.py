@@ -22,12 +22,11 @@ def to_sql(item):
       return str(item)
 
 
-# Gets decoded reports list of dicts from Kafka and tries to save them all
-# in DB under the same transaction. If transaction fails, exception is passed
-# to a caller function, whole reports list is not commited.
-def save_reports_to_db(db_cfg, reports, topic):
-  msg = "Saving to DB %s reports..." % len(reports)
-  logger.info(msg)
+# Translates reports dicts recieved from Kafka to string of SQL 
+# statements with 1 trailing commit. Returns that SQL string.
+def compose_sql(reports, topic):
+  msg = "Compose SQL..."
+  logger.debug(msg)
 
   table_cols = ["topic", "url", "event_date", "is_fine", "transport", 
   "response_code", "response_time", "regexp", "regexp_found", 
@@ -52,6 +51,17 @@ def save_reports_to_db(db_cfg, reports, topic):
     sql += item
 
   sql += "COMMIT;"
+  return sql
+
+
+# Gets decoded reports list of dicts from Kafka and tries to save them all
+# in DB under the same transaction. If transaction fails, exception is passed
+# to a caller function, whole reports list is not commited.
+def save_reports_to_db(db_cfg, reports, topic):
+  msg = "Saving to DB %s reports..." % len(reports)
+  logger.info(msg)
+
+  sql = compose_sql(reports, topic)
   apply_to_db(db_cfg, sql)
 
 

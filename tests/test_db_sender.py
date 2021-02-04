@@ -1,5 +1,5 @@
 import pytest
-from libs.db_sender import to_sql, apply_to_db, save_reports_to_db
+from libs.db_sender import to_sql, apply_to_db, save_reports_to_db, compose_sql
 
 
 def test_to_sql_string():
@@ -32,11 +32,11 @@ def test_to_sql_True():
   assert sql == "True"
 
 
-from libs.config_loader import load_config, validate_cfg
 from tests.conftest import get_db_cfg
 from attrdict import AttrDict
 
 
+@pytest.mark.skip(reason="In CI need a PostgreSQL server to test this.")
 def test_apply_to_db_works():
   db_cfg = get_db_cfg()
   sql = 'SELECT * FROM web_monitoring LIMIT 1;'
@@ -45,16 +45,29 @@ def test_apply_to_db_works():
   assert 1 == 1
 
 
-def test_save_reports_to_db_works(prepare_db):
-  db_cfg = get_db_cfg()
-
+def form_reports():
   report = {"url": "http://pytest", "event_date": None, "is_fine": True,
             "transport": "pytest", "response_code": 0, "response_time": 0.1, 
             "regexp": "string", "regexp_found": True, "timeout": 1.1, "period": 2.2}
   attr_dict = AttrDict({'value': report})  # need this because kafka sends
                                            # reports in .value attributes
-  reports = [attr_dict]
+  return [attr_dict]
+
+
+@pytest.mark.skip(reason="In CI need a PostgreSQL server to test this.")
+def test_save_reports_to_db_works(prepare_db):
+  db_cfg = get_db_cfg()
+
+  reports = form_reports()
   topic = 'pytest'
 
   save_reports_to_db(db_cfg, reports, topic)
+  assert 1 == 1
+
+
+def test_compose_sql_works():
+  reports = form_reports()
+  topic = 'pytest'
+
+  compose_sql(reports, topic)
   assert 1 == 1

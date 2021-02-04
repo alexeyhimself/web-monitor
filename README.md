@@ -96,10 +96,10 @@ Logs will have INFO level if you add in `.local_debug` the following structure:
 ```
 Extend this file for your needs.
 
-## Autotests
+## Autotests [![Codeship Status](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064/status?logo=codeship)](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064)
 - To execute autotests in `web-monitor` folder run a command:
 ```
-pytest
+pytest -v
 ```
 - To view test-coverage in `web-monitor` folder run a command:
 ```

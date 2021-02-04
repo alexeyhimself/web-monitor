@@ -93,6 +93,7 @@ def test_response_code_200():
   report = pre_kafka_queue.get()
 
   assert report.get('transport') == 'connected'
+  assert report.get('response_code') == 200
   assert report.get('is_fine') == True
 
 
@@ -107,6 +108,7 @@ def test_response_code_not_200():
   report = pre_kafka_queue.get()
 
   assert report.get('transport') == 'connected'
+  assert report.get('response_code') == 500
   assert report.get('is_fine') == False
 
 

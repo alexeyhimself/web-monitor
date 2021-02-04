@@ -1,4 +1,4 @@
-Web-Monitor Service
+Web-Monitor Service [![Codeship Status](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064/status?logo=codeship)](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064)
 ===========================
 A Python app that periodically checks availability of specified HTTP(S) URL(s), forms JSON reports on those monitoring results, puts those reports to Kafka, and polls Kafka to store those reports in PostgreSQL DBMS. App can work in 2 modes: as `monitor` and as `backup` service.
 

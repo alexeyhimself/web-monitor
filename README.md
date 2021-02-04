@@ -97,6 +97,12 @@ Logs will have INFO level if you add in `.local_debug` the following structure:
 Extend this file for your needs.
 
 ## Autotests
+### Before running autotests
+- Create test Kafka topic
+- Create test monitoring table in DB (apply SQL commands from `install/init_monitoring_db.sql` file)
+- Fill `db_pytest` and `kafka_pytest` sections in `config.json`
+
+### Running tests
 - To execute autotests in `web-monitor` folder run a command:
 ```
 pytest

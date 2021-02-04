@@ -63,7 +63,7 @@ def test_load_config_with_invalid_path_param(cfg_path):
 def test_load_config_with_valid_path_param(tmp_path):
   cp = tmp_path / "config.json"
   cp.write_text('{}')
-  cfg = load_config(cp)
+  cfg = load_config(str(cp))
   assert isinstance(cfg, dict) == True
 
 

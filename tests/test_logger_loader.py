@@ -1,5 +1,3 @@
-import pytest
-
 try:
   from libs.logger_loader import *
   loaded = True

@@ -1,4 +1,3 @@
-import pytest
 from libs.db_sender import to_sql, apply_to_db, save_reports_to_db
 
 

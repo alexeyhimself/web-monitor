@@ -1,3 +1,4 @@
+import pytest
 from libs.db_sender import to_sql, apply_to_db, save_reports_to_db
 
 
@@ -32,13 +33,8 @@ def test_to_sql_True():
 
 
 from libs.config_loader import load_config, validate_cfg
+from tests.conftest import get_db_cfg
 from attrdict import AttrDict
-
-
-def get_db_cfg():
-  cfg = load_config()
-  validate_cfg(cfg)
-  return cfg.get("db_pytest", {})
 
 
 def test_apply_to_db_works():
@@ -49,7 +45,7 @@ def test_apply_to_db_works():
   assert 1 == 1
 
 
-def test_save_reports_to_db_works():
+def test_save_reports_to_db_works(prepare_db):
   db_cfg = get_db_cfg()
 
   report = {"url": "http://pytest", "event_date": None, "is_fine": True,

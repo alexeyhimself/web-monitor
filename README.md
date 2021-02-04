@@ -1,4 +1,4 @@
-Web-Monitor Service
+Web-Monitor Service [![Codeship Status](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064/status?logo=codeship)](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064)
 ===========================
 A Python app that periodically checks availability of specified HTTP(S) URL(s), forms JSON reports on those monitoring results, puts those reports to Kafka, and polls Kafka to store those reports in PostgreSQL DBMS. App can work in 2 modes: as `monitor` and as `backup` service.
 
@@ -96,10 +96,10 @@ Logs will have INFO level if you add in `.local_debug` the following structure:
 ```
 Extend this file for your needs.
 
-## Autotests
+## Autotests [![Codeship Status](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064/status?logo=codeship)](https://app.codeship.com/projects/438e3437-cd95-417b-a060-a2aecb92d064)
 - To execute autotests in `web-monitor` folder run a command:
 ```
-pytest
+pytest -v
 ```
 - To view test-coverage in `web-monitor` folder run a command:
 ```

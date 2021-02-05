@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def init_kafka_consumer(cfg):
   logger.info("Starting Kafka consumer connector...")
 
-  kafka_cfg = cfg.get("kafka")
+  kafka_cfg = cfg.get("kafka", {})
 
   host = kafka_cfg.get("host", "")
   port = kafka_cfg.get("port", "")

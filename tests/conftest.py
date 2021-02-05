@@ -22,14 +22,14 @@ def apply_sql_to_db(db_cfg, sql):
       cursor.execute(sql)
 
 
-def get_db_cfg():
+def get_cfg_part(part):
   cfg = load_config()
   validate_cfg(cfg)
-  return cfg.get("db_pytest", {})
+  return cfg.get(part, {})
 
 
 def cleanup_db():
-  db_cfg = get_db_cfg()
+  db_cfg = get_cfg_part('db_pytest')
   sql = "DELETE FROM web_monitoring WHERE url = 'http://pytest'; COMMIT;"
   apply_sql_to_db(db_cfg, sql)
 

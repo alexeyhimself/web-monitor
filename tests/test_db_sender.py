@@ -83,12 +83,18 @@ def test_save_reports_to_db_exits_when_invalid_config():
 
   with pytest.raises(Exception) as pytest_wrapped_e:
     save_reports_to_db(db_cfg, reports, topic)
-  assert pytest_wrapped_e.type == psycopg2.OperationalError
+  assert pytest_wrapped_e.type in [
+    psycopg2.OperationalError, 
+    psycopg2.errors.UndefinedTable
+  ]
 
-@pytest.mark.d
+
 def test_apply_to_db_exits_when_invalid_config():
   db_cfg = {}
   sql = 'SELECT * FROM web_monitoring LIMIT 1;'
   with pytest.raises(Exception) as pytest_wrapped_e:
     apply_to_db(db_cfg, sql)
-  assert pytest_wrapped_e.type == psycopg2.OperationalError
+  assert pytest_wrapped_e.type in [
+    psycopg2.OperationalError,
+    psycopg2.errors.UndefinedTable
+  ]

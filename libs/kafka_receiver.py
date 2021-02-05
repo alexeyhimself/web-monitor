@@ -51,6 +51,23 @@ def init_kafka_consumer(cfg):
     sys.exit()  # exit, because unrecoverable failure
 
 
+def check_queue_and_send_to_db(consumer, topic, cfg):
+  logger.info("Starting Kafka queue processing...")
+
+  db_cfg = cfg.get("db", {})
+
+  while True:
+    report_items = consumer.poll(timeout_ms=1000)
+    if report_items:
+      logger.info("Just received from Kafka reports.")
+      for tp, msgs in report_items.items():
+        save_reports_to_db(db_cfg, msgs, topic)
+        consumer.commit()  # commit only if DB saved without errors
+
+    else:
+      logger.info("Nothing received from Kafka yet.")
+
+
 # Every 1 second (timeout_ms is defined in consumer.poll) tries to poll 
 # reports from Kafka queue. If Kafka is unavailable, tries to 
 # poll reports with throtling timeout (10s). Never ends.
@@ -58,24 +75,11 @@ def backup_kafka_to_db(cfg):
   logger.info("Starting Kafka to PostgreSQL backup...")
 
   consumer, topic = init_kafka_consumer(cfg)
-  db_cfg = cfg.get("db", {})
+  try:
+    check_queue_and_send_to_db(consumer, topic, cfg)
 
-  logger.info("Starting Kafka queue processing...")
-
-  while True:
-    try:
-      report_items = consumer.poll(timeout_ms=1000)
-      if report_items:
-        logger.info("Just received from Kafka reports.")
-        for tp, msgs in report_items.items():
-          save_reports_to_db(db_cfg, msgs, topic)
-          consumer.commit()  # commit only if DB saved without errors
-
-      else:
-        logger.info("Nothing received from Kafka yet.")
-
-    except Exception as why:
-      logger.error(str(why), exc_info=True)
-      msg = "Waiting for a throtling period to allow Kafka or DB to recover."
-      logger.info(msg)
-      time.sleep(10)  # requests throtling
+  except Exception as why:
+    logger.error(str(why), exc_info=True)
+    msg = "Waiting for a throtling period to allow Kafka or DB to recover."
+    logger.info(msg)
+    time.sleep(10)  # requests throtling

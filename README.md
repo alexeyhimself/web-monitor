@@ -103,7 +103,8 @@ pytest -v
 ```
 - To view test-coverage in `web-monitor` folder run a command:
 ```
-pytest --cov=libs/
+coverage run -m pytest tests
+coverage report
 ```
 
 ## License

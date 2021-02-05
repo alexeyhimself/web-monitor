@@ -1,0 +1,6 @@
+[run]
+source = .
+omit = *tests*,lib/*,bin/*,.pytest_cache/*
+
+[report]
+omit = *tests*,lib/*,bin/*,.pytest_cache/*

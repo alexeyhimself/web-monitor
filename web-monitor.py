@@ -52,7 +52,7 @@ def start_monitor(cfg):
 from libs.kafka_receiver import backup_kafka_to_db
 
 
-def start_kafka_to_db(cfg):
+def start_backuper(cfg):
   logger.info("Starting Kafka to PostgreSQL backup service...")
 
   backup_kafka_to_db(cfg)
@@ -74,14 +74,14 @@ if __name__ == '__main__':
   dev_mode = ld_cfg.get("mode")
   if dev_mode:
     if dev_mode == "backup":
-      start_kafka_to_db(cfg)
+      start_backuper(cfg)
     elif dev_mode == "monitor":
       start_monitor(cfg)
 
   else:
     mode = cfg.get("mode")
     if mode == "backup":
-      start_kafka_to_db(cfg)
+      start_backuper(cfg)
     elif mode == "monitor":
       start_monitor(cfg)
 

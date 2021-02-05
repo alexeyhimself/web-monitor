@@ -43,7 +43,7 @@ logging_config = {
     },
     'file': {
       'class': 'logging.handlers.RotatingFileHandler',
-      'filename': './logs/monitor.log',
+      'filename': './logs/web-monitor.log',
       'maxBytes': 1024*1024*150,  # 15MB
       'backupCount': 10,
       'formatter': 'verbose'

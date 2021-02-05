@@ -80,11 +80,11 @@ Mandatory parameter - is `url`. Other parameters are optional:
 ## Start monitoring server
 In `web-monitor` folder run:
 ```
-python3 monitor.py
+python3 web-monitor.py
 ```
 
 ## Logs
-Service logs messages by default to `logs/monitor.log`. But it can log to console as well.
+Service logs messages by default to `logs/web-monitor.log`. But it can log to console as well.
 
 ## Help for developers
 If you create `.local_debug` file in `web-monitor` folder (it is already in .gitignore) then logs will be redirected from file to console. 

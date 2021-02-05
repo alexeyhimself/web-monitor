@@ -6,7 +6,7 @@ pyvenv.cfg
 *.pyc
 
 configs/config.dev.json
-
+logs/web-monitor.log
 
 .local_debug
 

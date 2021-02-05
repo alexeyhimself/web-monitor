@@ -53,7 +53,10 @@ def test_check_queue_and_send_to_db_works():
 
   with pytest.raises(Exception) as pytest_wrapped_e:
     check_queue_and_send_to_db(consumer, topic, cfg)
-  assert pytest_wrapped_e.type == psycopg2.OperationalError
+  assert pytest_wrapped_e.type in [
+    psycopg2.OperationalError,
+    psycopg2.errors.UndefinedTable
+  ]
 
   signal.alarm(0)
 

@@ -43,3 +43,25 @@ def prepare_db():
 
   # teardown
   pass
+
+
+from attrdict import AttrDict
+report = {"url": "http://pytest", "event_date": None, "is_fine": True,
+          "transport": "pytest", "response_code": 0, "response_time": 0.1,
+          "regexp": "string", "regexp_found": True, "timeout": 1.1, 
+          "period": 2.2}
+
+
+def form_post_kafka_reports():
+  attr_dict = AttrDict({'value': report})  # need this because kafka sends
+                                           # reports in .value attributes
+  return [attr_dict]
+
+
+from multiprocessing import JoinableQueue
+
+
+def form_pre_kafka_queue():
+  pre_kafka_queue = JoinableQueue()
+  pre_kafka_queue.put(report)
+  return pre_kafka_queue, report

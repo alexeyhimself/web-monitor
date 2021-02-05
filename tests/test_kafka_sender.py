@@ -1,5 +1,5 @@
 import pytest
-from tests.conftest import get_cfg_part
+from tests.conftest import get_cfg_part, form_pre_kafka_queue
 from multiprocessing import JoinableQueue
 
 from libs.kafka_sender import dump_queue, init_kafka_producer
@@ -19,15 +19,6 @@ def test_kafka_producer_sys_exits_when_invalid_config():
     producer, topic = init_kafka_producer(kafka_cfg)
   assert pytest_wrapped_e.type == SystemExit
 
-
-def form_pre_kafka_queue():
-  pre_kafka_queue = JoinableQueue()
-  report = {"url": "http://pytest", "event_date": None, "is_fine": True,
-            "transport": "pytest", "response_code": 0, "response_time": 0.1,
-            "regexp": "string", "regexp_found": True, "timeout": 1.1, 
-            "period": 2.2}
-  pre_kafka_queue.put(report)
-  return pre_kafka_queue, report
 
 def test_dump_queue_works():
   pre_kafka_queue, report = form_pre_kafka_queue()

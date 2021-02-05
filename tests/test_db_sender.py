@@ -32,8 +32,8 @@ def test_to_sql_True():
   assert sql == "True"
 
 
-from tests.conftest import get_cfg_part
-from attrdict import AttrDict
+from tests.conftest import get_cfg_part, form_post_kafka_reports
+
 
 
 @pytest.mark.skip(reason="In CI need a PostgreSQL server to test this.")
@@ -43,15 +43,6 @@ def test_apply_to_db_works_when_valid_config():
 
   apply_to_db(db_cfg, sql)
   assert 1 == 1
-
-
-def form_post_kafka_reports():
-  report = {"url": "http://pytest", "event_date": None, "is_fine": True,
-            "transport": "pytest", "response_code": 0, "response_time": 0.1, 
-            "regexp": "string", "regexp_found": True, "timeout": 1.1, "period": 2.2}
-  attr_dict = AttrDict({'value': report})  # need this because kafka sends
-                                           # reports in .value attributes
-  return [attr_dict]
 
 
 @pytest.mark.skip(reason="In CI need a PostgreSQL server to test this.")

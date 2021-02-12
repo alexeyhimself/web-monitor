@@ -3,8 +3,6 @@ import sys
 import time
 import requests
 
-from datetime import datetime
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -16,7 +14,7 @@ from libs.config_loader import DEFAULT_TIMEOUT, DEFAULT_PERIOD
 # puts that report to pre-Kafka queue. In case of unrecoverable failure
 # sys.exit()'s
 def call_url(url, timeout, period, regexp, pre_kafka_queue):
-  time_start = datetime.utcnow()
+  time_start = time.monotonic()
 
   report = {
     'url': url,
@@ -27,11 +25,9 @@ def call_url(url, timeout, period, regexp, pre_kafka_queue):
 
   try:
     r = requests.get(url, timeout=timeout)
-    time_end = datetime.utcnow()
+    time_end = time.monotonic()
 
-    # if OS time sync will happen during request and will be corrected back
-    # then diff may become < 0! Many if's but may happen in long time use.
-    response_time = round((time_end - time_start).microseconds / 1000000, 3)
+    response_time = round(time_end - time_start, 3)
 
     # overall result to look at, aggregates: 
     # response_code + transport issues + regexp

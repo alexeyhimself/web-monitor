@@ -50,7 +50,6 @@ def compose_sql(reports, topic):
 
     sql += item
 
-  sql += "COMMIT;"
   return sql
 
 
@@ -86,3 +85,4 @@ def apply_to_db(db_cfg, sql):
   with closing(conn) as c:
     with c.cursor() as cursor:
       cursor.execute(sql)
+      conn.commit ()

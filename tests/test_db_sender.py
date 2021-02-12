@@ -1,39 +1,6 @@
 import pytest
-from libs.db_sender import to_sql, apply_to_db, save_reports_to_db, compose_sql
-
-
-def test_to_sql_string():
-  sql = to_sql("string")
-  assert sql == "'string'"
-
-
-def test_to_sql_1():
-  sql = to_sql(1)
-  assert sql == "1"
-
-
-def test_to_sql_0():
-  sql = to_sql(0)
-  assert sql == "0"
-
-
-def test_to_sql_None():
-  sql = to_sql(None)
-  assert sql == "NULL"
-
-
-def test_to_sql_False():
-  sql = to_sql(False)
-  assert sql == "False"
-
-
-def test_to_sql_True():
-  sql = to_sql(True)
-  assert sql == "True"
-
-
+from libs.db_sender import apply_to_db, save_reports_to_db, compose_sql
 from tests.conftest import get_cfg_part, form_post_kafka_reports
-
 
 
 @pytest.mark.skip(reason="In CI need a PostgreSQL server to test this.")
@@ -50,7 +17,7 @@ def test_save_reports_to_db_works_when_valid_config(prepare_db):
   db_cfg = get_cfg_part('db_pytest')
 
   reports = form_post_kafka_reports()
-  topic = 'pytest'
+  topic = 'pytest_topic'
 
   save_reports_to_db(db_cfg, reports, topic)
   assert 1 == 1
@@ -58,9 +25,9 @@ def test_save_reports_to_db_works_when_valid_config(prepare_db):
 
 def test_compose_sql_works():
   reports = form_post_kafka_reports()
-  topic = 'pytest'
+  topic = 'pytest_topic'
 
-  compose_sql(reports, topic)
+  sql, vals = compose_sql(reports, topic)
   assert 1 == 1
 
 
@@ -70,7 +37,7 @@ import psycopg2
 def test_save_reports_to_db_exits_when_invalid_config():
   db_cfg = {}
   reports = form_post_kafka_reports()
-  topic = 'pytest'
+  topic = 'pytest_topic'
 
   with pytest.raises(Exception) as pytest_wrapped_e:
     save_reports_to_db(db_cfg, reports, topic)
@@ -84,7 +51,7 @@ def test_apply_to_db_exits_when_invalid_config():
   db_cfg = {}
   sql = 'SELECT * FROM web_monitoring LIMIT 1;'
   with pytest.raises(Exception) as pytest_wrapped_e:
-    apply_to_db(db_cfg, sql)
+    apply_to_db(db_cfg, sql, ())
   assert pytest_wrapped_e.type in [
     psycopg2.OperationalError,
     psycopg2.errors.UndefinedTable

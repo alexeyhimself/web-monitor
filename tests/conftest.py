@@ -47,7 +47,7 @@ def prepare_db():
 
 from attrdict import AttrDict
 report = {"url": "http://pytest", "event_date": None, "is_fine": True,
-          "transport": "pytest", "response_code": 0, "response_time": 0.1,
+          "transport": "pytest_transport", "response_code": 0, "response_time": 0.1,
           "regexp": "string", "regexp_found": True, "timeout": 1.1, 
           "period": 2.2}
 

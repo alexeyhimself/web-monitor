@@ -7,21 +7,6 @@ import psycopg2
 from contextlib import closing
 
 
-# Translates Python data values to SQL values.
-# For example, None to NULL, abc to 'abc'...
-def to_sql(item):
-  if item:
-    if isinstance(item, str):
-      return "'" + item + "'"
-    else:  # True, number != 0 for example
-      return str(item)
-  else:
-    if item is None:  # special value
-      return "NULL"
-    else:  # False, number == 0 for example
-      return str(item)
-
-
 # Translates reports dicts recieved from Kafka to string of SQL 
 # statements with 1 trailing commit. Returns that SQL string.
 def compose_sql(reports, topic):
@@ -40,17 +25,19 @@ def compose_sql(reports, topic):
     r["topic"] = topic
     r["date_created"] = str(datetime.utcnow())
 
+    vals = ()
     values = []
     for each_col in table_cols:
-      value = to_sql(r.get(each_col))
-      values.append(value)
+      values.append("%s")
+      value = r.get(each_col)
+      vals = vals + (value,)
 
     item = "INSERT INTO web_monitoring (" + ",".join(table_cols) + ") "
     item += "VALUES (" + ",".join(values) + ");"
 
     sql += item
 
-  return sql
+  return sql, vals
 
 
 # Gets decoded reports list of dicts from Kafka and tries to save them all
@@ -60,14 +47,14 @@ def save_reports_to_db(db_cfg, reports, topic):
   msg = "Saving to DB %s reports..." % len(reports)
   logger.info(msg)
 
-  sql = compose_sql(reports, topic)
-  apply_to_db(db_cfg, sql)
+  sql, vals = compose_sql(reports, topic)
+  apply_to_db(db_cfg, sql, vals)
 
 
 # Establishes connection to DB and executes given sql on DB
 # If exception, then it is passed to a caller function
 # Used materials from: https://khashtamov.com/ru/postgresql-python-psycopg2
-def apply_to_db(db_cfg, sql):
+def apply_to_db(db_cfg, sql, vals):
   logger.debug("Execute SQL script...")
 
   # All connectivity and transport exceptions will handled by the upper level 
@@ -85,8 +72,8 @@ def apply_to_db(db_cfg, sql):
   with closing(conn) as c:
     with c.cursor() as cursor:
       try:
-        cursor.execute(sql)
+        cursor.execute(sql, vals)
         conn.commit()
       except Exception as why:
         conn.rollback()
-        raise
+        raise why

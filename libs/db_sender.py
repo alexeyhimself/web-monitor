@@ -84,5 +84,9 @@ def apply_to_db(db_cfg, sql):
 
   with closing(conn) as c:
     with c.cursor() as cursor:
-      cursor.execute(sql)
-      conn.commit ()
+      try:
+        cursor.execute(sql)
+        conn.commit()
+      except Exception as why:
+        conn.rollback()
+        raise
